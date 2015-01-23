@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_vmi_recon_manager,vmi.recon.manager,model_vmi_recon,vmi.group_vmi_manager,1,1,1,1
+access_vmi_envstat_manager,vmi.envstat.manager,model_vmi_envstat,vmi.group_vmi_manager,1,1,1,1
+access_vmi_pod_manager,vmi.pod.manager,model_vmi_pod,vmi.group_vmi_manager,1,1,1,1
+access_vmi_inventory_manager,vmi.inventory.manager,model_vmi_inventory,vmi.group_vmi_manager,1,1,1,1
+access_vmi_recon_user,vmi.recon.user,model_vmi_recon,vmi.group_vmi_user,1,1,1,0
+access_vmi_envstat_user,vmi.envstat.user,model_vmi_envstat,vmi.group_vmi_user,1,1,1,0
+access_vmi_pod_user,vmi.pod.user,model_vmi_pod,vmi.group_vmi_user,1,1,1,0
+access_vmi_inventory_user,vmi.inventory.user,model_vmi_inventory,vmi.group_vmi_user,1,1,1,0

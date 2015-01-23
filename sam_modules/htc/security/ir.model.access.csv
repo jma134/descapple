@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_htc_master_manager,htc.master.manager,model_htc_master,htc.group_htc_manager,1,1,0,0
+access_htc_customer_manager,htc.customer.manager,model_htc_customer,htc.group_htc_manager,1,1,0,0
+access_htc_item_manager,htc.item.manager,model_htc_item,htc.group_htc_manager,1,1,0,0
+access_htc_master_user,htc.master.user,model_htc_master,htc.group_htc_user,1,0,0,0
+access_htc_customer_user,htc.customer.user,model_htc_customer,htc.group_htc_user,1,0,0,0
+access_htc_item_user,htc.item.user,model_htc_item,htc.group_htc_user,1,0,0,0

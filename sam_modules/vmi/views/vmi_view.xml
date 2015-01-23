@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <menuitem name="VMI" id="menu_vmi_root" sequence="108"/>
+		<menuitem id="menu_vmi_warehouse_mgmt" name="VMI_SH" parent="menu_vmi_root" sequence="1"/>
+		<menuitem id="menu_vmi_warehouse_op" name="Operation" parent="menu_vmi_root" sequence="2"/>
+		
+		<menuitem id="menu_vmi_product" name="Products" parent="menu_vmi_root" sequence="6"/>		
+<!--  		<menuitem name="Products by Category" id="menu_product_by_category_vmi_form" action="product.product_category_action" parent="menu_vmi_product" sequence="0"/>-->
+		<menuitem action="product.product_normal_action" id="menu_vmi_products_menu" parent="menu_vmi_product" sequence="1"/>
+		
+
+<!--
+    VMI environment statics
+-->		      
+        <record id="view_vmi_envstat_tree" model="ir.ui.view">
+            <field name="name">vmi.envstat.tree</field>
+            <field name="model">vmi.envstat</field>
+            <field name="arch" type="xml">
+            <tree colors="blue:state == 'draft';grey:state == 'cancel';red:state not in ('cancel', 'done') and date_recorded &lt; current_date" string="vmi envstat list">
+                <field name="name"/>
+                <field name="date_recorded"/>
+                <field name="humidity"/>
+                <field name="temperature"/>
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>    
+                
+		<record id="view_vmi_envstat_form" model="ir.ui.view">
+            <field name="name">vmi.envstat.form</field>
+            <field name="model">vmi.envstat</field>	
+            <field name="arch" type="xml">
+                <form string="vmi envstat form" version="7.0">
+                <header>
+<!--                     <button name="draft_force_assign" states="draft" string="Confirm" type="object" class="oe_highlight" groups="base.group_user"/>
+                    <button name="draft_validate" states="draft" string="Confirm &amp; Transfer" type="object" class="oe_highlight" groups="base.group_user"/>
+                    <button name="action_assign" states="confirmed" string="Check Availability" type="object" class="oe_highlight"/>
+                    <button name="force_assign" states="confirmed" string="Force Availability" type="object" class="oe_highlight" groups="base.group_user"/>
+                    <button name="action_process" states="assigned" string="Confirm &amp; Transfer" groups="stock.group_stock_user" type="object" class="oe_highlight"/>
+                    <button name="button_cancel" states="assigned,confirmed,draft" string="Cancel Transfer" groups="base.group_user"/> -->
+                    <field name="state" widget="statusbar" clickable="True" statusbar_visible="draft,assigned,done" statusbar_colors='{"shipping_except":"red","invoice_except":"red","waiting_date":"blue"}'/>
+                </header>                
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="date_recorded"/>
+                        <field name="humidity"/>
+                		<field name="temperature"/>                            
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread" options='{"thread_level": 1}'/>
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                </div>                
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_vmi_envstat_calendar" model="ir.ui.view">
+            <field name="name">vmi.envstat.calendar</field>
+            <field name="model">vmi.envstat</field>
+            <field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar string="Calendar View" date_start="date_recorded" color="name">
+                    <field name="humidity"/>
+                    <field name="temperature"/>
+                </calendar>
+            </field>
+        </record>   	
+		
+        <record id="view_vmi_envstat_search" model="ir.ui.view">
+            <field name="name">vmi.envstat.search</field>
+            <field name="model">vmi.envstat</field>
+            <field name="arch" type="xml">
+                <search string="vmi envstat">
+                    <field name="name"/>
+                    <filter string="New" domain="[('state', '=', 'draft')]"
+                            help="New Records"/>
+                    <filter string="In Progress" domain="[('state','=', 'assigned')]"
+                            help="Assigned Records"/>
+                    <filter string="Accepted" domain="[('state','=', 'done')]"
+                            help="Done Records" />
+                    <group expand="0" string="Group By...">
+<!--                         <filter string="Creator" help="By Responsible" context="{'group_by': 'user_id'}"/> -->
+                        <filter string="Status" help="By State" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>                
+            </field>
+        </record>      		        
+        
+        <record id="action_vmi_tree1" model="ir.actions.act_window">
+            <field name="name">Hub Stat</field>
+            <field name="res_model">vmi.envstat</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,calendar</field>
+            <field name="domain">[('hub','=','SHA')]</field>
+            <field name="search_view_id" ref="view_vmi_envstat_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create an Temp/Hum record. 
+              </p><p>
+                Most operations are prepared automatically by Themostat,
+                but you can also record manual hub environment stats.
+              </p>
+            </field>
+        </record>
+                                
+    	<menuitem action="action_vmi_tree1" id="menu_action_vmi_tree1" parent="menu_vmi_warehouse_mgmt" sequence="6"/>
+
+<!--
+    VMI POD
+-->
+        
+        <record id="view_vmi_pod_tree" model="ir.ui.view">
+            <field name="name">vmi.pod.tree</field>
+            <field name="model">vmi.pod</field>
+            <field name="arch" type="xml">
+            <tree colors="blue:state == 'draft';grey:state == 'cancel';red:state not in ('cancel', 'done') and ETD &lt; current_date" string="vmi pod list">
+                <field name="etd"/>
+                <field name="product_id"/>
+                <field name="dn"/>
+                <field name="product_qty"/>
+                <field name="partner_id"/>
+                <field name="hawb"/>
+                <field name="date_updated"/>
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>    
+        
+        <record id="view_vmi_pod_form" model="ir.ui.view">
+            <field name="name">vmi.pod.form</field>
+            <field name="model">vmi.pod</field>
+            <field name="arch" type="xml">
+                <form string="VMI POD" version="7.0">
+                <header>
+                    <button name="draft_force_assign" states="draft" string="Confirm" type="object" class="oe_highlight" groups="base.group_user"/>
+                    <button name="draft_validate" states="draft" string="Confirm &amp; Transfer" type="object" class="oe_highlight" groups="base.group_user"/>
+                    <button name="action_assign" states="confirmed" string="Check Availability" type="object" class="oe_highlight"/>
+                    <button name="force_assign" states="confirmed" string="Force Availability" type="object" class="oe_highlight" groups="base.group_user"/>
+                    <button name="action_process" states="assigned" string="Confirm &amp; Transfer" groups="stock.group_stock_user" type="object" class="oe_highlight"/>
+                    <button name="button_cancel" states="assigned,confirmed,draft" string="Cancel Transfer" groups="base.group_user"/>                  
+                    <field name="state" widget="statusbar" clickable="True" statusbar_visible="draft,assigned,done" statusbar_colors='{"shipping_except":"red","invoice_except":"red","waiting_date":"blue"}'/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>ETD <field name="etd" class="oe_inline"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <!-- <field name="product_id" on_change="product_id_change(product_id, product_qty)" domain="[('bom_ids','!=',False),('bom_ids.bom_id','=',False)]" class="oe_inline" context='{"default_supply_method":"produce", "default_type": "product"}'/> -->
+                            <field name="product_id" class="oe_inline" context='{"default_supply_method":"produce", "default_type": "product"}'/>
+                            <label for="product_qty"/>
+                            <div>
+                                <field name="product_qty" class="oe_inline"/>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="partner_id" required="1"/>
+                            <field name="dn"/>
+                            <field name="hawb"/>
+                        </group>
+                    </group>
+                </sheet>
+                </form>
+            </field>
+        </record>    
+         
+	    <record id="vmi_pod_action" model="ir.actions.act_window">
+	    <field name="name">POD</field>
+	    <field name="type">ir.actions.act_window</field>
+	    <field name="res_model">vmi.pod</field>
+	    <field name="view_type">form</field>
+	    <field name="view_mode">tree,form</field>
+	    <field name="view_id" eval="False"/>
+	    <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">
+	        Click to create a POD record. 
+	      </p><p>
+	        A adfaf order, based on a bill of materials, will
+	        consume raw afaasd and produce adf products.
+	      </p><p>
+	        asdf orders are af proposed asdf based
+	        on customer af or automated rules asdf the minimum
+	        stock rule.
+	      </p>
+	    </field>
+	</record>
+	<menuitem action="vmi_pod_action" id="menu_vmi_pod_action" parent="menu_vmi_warehouse_mgmt" sequence="7"/>
+
+
+<!--
+    VMI Inventory
+-->               
+	        <record id="view_vmi_inventory_tree" model="ir.ui.view">
+            <field name="name">vmi.inventory.tree</field>
+            <field name="model">vmi.inventory</field>
+            <field name="arch" type="xml">
+            <tree colors="blue:state == 'draft';grey:state == 'done';red:state not in ('waiting', 'assigned')" string="vmi inv list">
+                <field name="hub"/>
+                <field name="location"/>
+                <field name="owner"/>
+                <field name="item"/>
+                <field name="itemdesc"/>
+                <field name="qty"/>
+                <field name="recvdate"/>
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>    
+        
+        <record id="view_vmi_inventory_form" model="ir.ui.view">
+            <field name="name">vmi.inventory.form</field>
+            <field name="model">vmi.inventory</field>
+            <field name="arch" type="xml">
+                <form string="VMI Inventory" version="7.0">
+                <header>          
+                    <field name="state" widget="statusbar" clickable="True" statusbar_visible="draft,assigned,done" statusbar_colors='{"shipping_except":"red","invoice_except":"red","waiting_date":"blue"}'/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                   
+                    </div>
+                    <group>
+                        <group>
+                           	<field name="hub" required="1"/>
+                            <field name="location"/>
+                            <field name="owner"/>
+                            <field name="recvdate"/>
+                        </group>
+                        <group>
+                            <field name="item" required="1"/>
+                            <field name="itemdesc"/>
+                            <field name="qty"/>
+                            <field name="containerid"/>
+                        </group>
+                    </group>
+                </sheet>
+                </form>
+            </field>
+        </record>         
+
+	    <record id="vmi_inventory_action" model="ir.actions.act_window">
+	    <field name="name">Inventory</field>
+	    <field name="type">ir.actions.act_window</field>
+	    <field name="res_model">vmi.inventory</field>
+	    <field name="view_type">form</field>
+	    <field name="view_mode">tree,form</field>
+	    <field name="view_id" eval="False"/>
+	    <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">
+	        Click to create a POD record. 
+	      </p><p>
+	        AAAAAAAAAAAAA
+	      </p><p>
+	        BBBBBBBBBBBBB
+	        CCCCCCCCCCCCC
+	        stock rule.
+	      </p>
+	    </field>
+		</record>
+		
+		<menuitem action="vmi_inventory_action" id="menu_vmi_inventory_action" parent="menu_vmi_warehouse_op" sequence="1"/>      
+		
+	
+<!--
+    VMI Inventory Rpt
+-->  	
+        <record model='ir.ui.view' id='view_vmi_inventoryrpt1_tree'>
+            <field name="name">vmi.inventory.rpt.tree</field>
+            <field name="model">vmi.inventory.rpt</field>
+            <field name="arch" type="xml">
+                <tree string="Inventory Costs">
+                    <field name="item"/>
+                    <field name="hub"/>
+                    <field name="recvdate"/>
+                    <field name="qty"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model='ir.ui.view' id='view_vmi_inventoryrpt1_search'>
+            <field name="name">vmi.inventory.rpt.search</field>
+            <field name="model">vmi.inventory.rpt</field>
+            <field name="arch" type="xml">
+                <search string="Inventory Costs" >
+                    <field name="item" />
+                    <field name="hub"/>
+                    <field name="recvdate"/>
+                    <field name="qty"/>
+                    <filter name="hub_sha" domain="[('hub','=','SHA')]" string="SHA BS Hub"/>
+                    <filter name="hub_szx" domain="[('hub','=','SZX')]" string="SZX FT Hub"/>
+                    <group expand="1" string="Group By...">
+                        <filter name="groupby_hub" context="{'group_by' : 'hub'}" string="Hub" help="Hub by XXX"/>
+                        <filter name="groupby_Item" context="{'group_by' : 'item'}" string="Item"/>
+                    </group>
+                </search>
+            </field>
+        </record>	
+        
+                
+
+        <record model='ir.ui.view' id='view_vmi_inventoryrpt1_form'>
+            <field name="name">vmi.inventory.rpt.form</field>
+            <field name="model">vmi.inventory.rpt</field>
+            <field name="arch" type="xml">
+                <form string="Inventory Costs" version="7.0">
+                    <sheet>
+                        <group col="2" string="Cost Details">
+                            <group>
+                                <field name="hub" />
+                                <field name="recvdate"/>
+                                <field name="qty"/>
+                            </group>
+                            <group>
+                                <field name="item"/>
+                                <field name="itemdesc"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+                
+        <record model='ir.actions.act_window' id='view_vmi_inventoryrpt1_act'>
+            <field name="name">Inventory Qty</field>
+            <field name="res_model">vmi.inventory.rpt</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+           <!--  <field name="context">{"search_default_hub_sha" : True, }</field> -->
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a new cost.
+              </p><p>
+                OpenERP helps you managing the costs for your different
+                vehicles. Costs are created automatically from services,
+                contracts (fixed or recurring) and fuel logs.
+              </p>
+            </field>
+        </record>
+        
+		<menuitem action="view_vmi_inventoryrpt1_act" id="menu_vmi_inventoryrpt1_action" parent="menu_vmi_warehouse_op" sequence="3"/>     
+	       
+                
+<!-- Stock Recon -->
+        <record id="view_vmi_recon_tree" model="ir.ui.view">
+            <field name="name">vmi.recon.tree</field>
+            <field name="model">vmi.recon</field>
+            <field name="arch" type="xml">
+                <tree string="Recon">
+	                <field name="name"/>
+	                <field name="partner"/>
+	                <field name="isano"/>
+	                <field name="docno"/>
+	                <field name="qty"/>
+	                <field name="partno"/>	
+	                <field name="lot"/>	                
+	                <field name="edidate"/>
+	                <field name="editime"/>	                                    
+                </tree>
+            </field>
+        </record>
+        <record id="vmi_recon_form" model="ir.ui.view">
+            <field name="name">vmi.recon.form</field>
+            <field name="model">vmi.recon</field>
+            <field name="arch" type="xml">
+                <form string="Recon" version="7.0">
+                    <group>
+		                <field name="name"/>
+		                <field name="partner"/>
+		                <field name="isano"/>
+		                <field name="docno"/>
+						<field name="qty"/>
+		                <field name="partno"/>
+		               	<field name="lot"/>	                
+		                <field name="edidate"/>
+		                <field name="editime"/>	
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record id="action_vmi_recon_tree" model="ir.actions.act_window">
+            <field name="name">Recon</field>
+            <field name="res_model">vmi.recon</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="action_vmi_recon_tree" id="menu_action_vmi_recon_open" parent="menu_vmi_warehouse_mgmt" sequence="7"/>
+        
+        
+        
+    </data>
+</openerp>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<<openerp>
+    <data>
+    
+        <!-- Top menu item -->
+        <menuitem name="VMI" id="menu_vmi_root" sequence="71"/>
+		<menuitem id="menu_vmi_warehouse_mgmt" name="VMI_aaa" parent="menu_vmi_root" sequence="1"/>
+        <menuitem id="menu_vmi_products_moves" name="VMI_bbb" parent="menu_vmi_root" sequence="2"/>   
+        <menuitem id="menu_stock_configuration" name="Configuration" parent="menu_vmi_root" sequence="15"/>
+
+        <record id="view_vmi_envstat_tree" model="ir.ui.view">
+            <field name="name">stock.envstat.tree</field>
+            <field name="model">stock.envstat</field>
+            <field name="arch" type="xml">
+                <tree colors="blue:state == 'draft';grey:state == 'cancel';red:state not in ('cancel', 'done') and date &lt; current_date" string="Picking list">
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="humidity"/>
+                    <field name="temperature"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_vmi_envstat_form" model="ir.ui.view">
+            <field name="name">stock.envstat.form</field>
+            <field name="model">stock.envstat</field>
+            <field eval="12" name="priority"/>
+            <field name="arch" type="xml">
+                <form string="vmi envstat" version="7.0">                                   
+                <sheet>
+                    <h1>
+                        <field name="name" class="oe_inline" attrs="{'invisible': [('name','=','/')]}" readonly="1"/>
+                    </h1>
+                    <group>
+                        <group>
+                          	<field name="date"/>
+                    		<field name="humidity"/>
+                    		<field name="temperature"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Remark">                           
+                            <field name="note" placeholder="Add an internal note..." class="oe_inline"/>
+                        </page>
+                        <page string="Additional Info">
+                            <group>
+
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                </form>
+            </field>
+        </record>        
+
+        <record id="action_vmi_tree1" model="ir.actions.act_window">
+            <field name="name">Hub Stat SH</field>
+            <field name="res_model">vmi.envstat</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">tree</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create an Temp/Hum record. 
+              </p><p>
+                Most operations are prepared automatically by Themostat,
+                but you can also record manual hub environment stats.
+              </p>
+            </field>
+        </record>
+                                
+    	<menuitem action="action_vmi_tree1" id="menu_action_vmi_tree1" parent="menu_vmi_warehouse_mgmt" sequence="6"/>
+
+    </data>
+</openerp>

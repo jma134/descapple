@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <menuitem name="Transport" id="menu_transport_root" sequence="109"/>
+		<menuitem id="menu_transport_edi" name="EDI" parent="menu_transport_root" sequence="1"/>
+		
+		<menuitem id="menu_transport_configuration" name="Configuration" parent="menu_transport_root" sequence="15"/>
+		<menuitem action="product.product_template_action" id="menu_transport_products_menu" parent="menu_transport_configuration" sequence="1"/>
+
+<!--
+    Transport EDI
+-->		     
+        <record id="view_transport_edi_tree" model="ir.ui.view">
+            <field name="name">transport.edi.tree</field>
+            <field name="model">transport.edi</field>
+            <field name="arch" type="xml">
+            <tree colors="blue:state == 'draft';grey:state == 'done'" string="transport edi list">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="isa"/>
+                <field name="eventcd"/>
+                <field name="recvtime"/>
+                <field name="sendtime"/>
+                <field name="exception"/>                               
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>    
+                
+		<record id="view_transport_edi_form" model="ir.ui.view">
+            <field name="name">transport.edi.form</field>
+            <field name="model">transport.edi</field>	
+            <field name="arch" type="xml">
+                <form string="transport edi form" version="7.0">
+                <header>
+                    <field name="state" widget="statusbar" clickable="True" statusbar_visible="draft,done" />
+                </header>                
+                <sheet>
+                    <group>
+						<group name="main_grp" string="DHL Link Info">
+                            <field name="name"/>
+                            <field name="category"/>
+                            <field name="isa"/>
+                            <field name="msgid"/>
+                            <field name="recvtime"/>
+                            <field name="sendtime"/>
+                            <field name="exception"/>
+                        </group>          
+                        <group name="origin_grp" string="EDI Details">
+                            <field name="eventcd"/>
+                            <field name="hawb"/>
+                            <field name="eventdate"/>
+                            <field name="city"/>
+                            <field name="gweight"/>
+                            <field name="partno"/>
+                            <field name="qty"/>                                                                                 
+                        </group>           
+                        <group name="destination_grp" string="Other">
+                            <field name="gentime"/>
+                            <field name="fname"/>
+                            <field name="remark"/>
+                            <field name="note"/>
+                        </group>
+                    </group>
+                </sheet>              
+                </form>
+            </field>
+        </record>
+       	
+		
+        <record id="view_transport_edi_search" model="ir.ui.view">
+            <field name="name">transport.edi.search</field>
+            <field name="model">transport.edi</field>
+            <field name="arch" type="xml">
+                <search string="transport edi">
+                    <field name="name"/>
+                    <filter name="in_new" string="New" domain="[('state', '=', 'draft')]"
+                            help="New EDI"/>
+                    <filter name="in_done" string="Archived" domain="[('state','=', 'done')]"
+                            help="Done EDI" />
+                    <group expand="0" string="Group By...">
+                        <filter string="Category" help="By Category" context="{'group_by': 'category'}"/>
+                        <filter string="BizNo" help="By BizNo" context="{'group_by': 'name'}"/>
+                    </group>
+                </search>                
+            </field>
+        </record>      		        
+        
+        <record id="action_transport_edi_tree" model="ir.actions.act_window">
+            <field name="name">Transport EDI</field>
+            <field name="res_model">transport.edi</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+<!--             <field name="domain">[('hub','=','SHA')]</field> -->
+            <field name="search_view_id" ref="view_transport_edi_search"/>
+            <field name="context">{'search_default_in_new':1}</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create an EDI record. 
+              </p><p>
+                Most operations are prepared automatically by EDI Tools,
+                so you needn't record manual EDI status.
+              </p>
+            </field>
+        </record>
+                                
+    	<menuitem action="action_transport_edi_tree" id="menu_action_transport_edi_tree" parent="menu_transport_edi" sequence="1"/>
+        
+
+<!--
+    Transport Course
+-->	
+		<record model="ir.ui.view" id="course_form_view">
+            <field name="name">course.form</field>
+            <field name="model">transport.course</field>
+            <field name="arch" type="xml">
+                <form string="Course Form">
+                    <sheet>
+						<group>
+                            <field name="name"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <notebook>
+                            <page string="Description">
+                                <field name="description"/>
+                            </page>
+                            <page string="About">
+                                This is an example of notebooks
+                            </page>
+                            <page string="Sessions">
+                                <field name="session_ids">
+                                    <tree string="Registered sessions">
+                                        <field name="name"/>
+                                        <field name="instructor_id"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+		<record model="ir.actions.act_window" id="course_list_action">
+            <field name="name">Courses</field>
+            <field name="res_model">transport.course</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first course
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="courses_menu" name="Courses" parent="menu_transport_edi"
+                  action="course_list_action"/>
+        <!-- Full id location:
+             action="openacademy.course_list_action"
+             It is not required when it is the same module -->
+
+<!-- session form view -->
+        <record model="ir.ui.view" id="session_form_view">
+            <field name="name">session.form</field>
+            <field name="model">transport.session</field>
+            <field name="arch" type="xml">
+                <form string="Session Form">
+                    <sheet>
+                        <group>
+                            <group string="General">
+                                <field name="course_id"/>
+                                <field name="name"/>
+                                <field name="instructor_id"/>
+                            </group>
+                            <group string="Schedule">
+                                <field name="start_date"/>
+                                <field name="duration"/>
+                                <field name="seats"/>
+                            </group>
+                            <label for="attendee_ids"/>
+                        	<field name="attendee_ids"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="session_list_action">
+            <field name="name">Sessions</field>
+            <field name="res_model">transport.session</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="session_menu" name="Sessions"
+                  parent="menu_transport_edi"
+                  action="session_list_action"/>
+                  
+                  
+                                  
+    </data>
+</openerp>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <menuitem name="HTC" id="menu_htc_root" sequence="108"/>
+		<menuitem id="menu_htc_edi" name="EDI" parent="menu_htc_root" sequence="1"/>
+
+<!--
+    Master Data Overview
+-->		     
+        <record id="view_htc_master_tree" model="ir.ui.view">
+            <field name="name">htc.master.tree</field>
+            <field name="model">htc.master</field>
+            <field name="arch" type="xml">
+	            <tree colors="blue:direction == 'Out';" string="HTC Master Lines">
+	                <field name="filename"/>
+	                <field name="filesize"/>
+	                <field name="category"/>
+	                <field name="direction"/>
+	                <field name="gentime"/>
+	            </tree>
+            </field>
+        </record>    
+                
+		<record id="view_htc_master_form" model="ir.ui.view">
+            <field name="name">htc.master.form</field>
+            <field name="model">htc.master</field>	
+            <field name="arch" type="xml">
+                <form string="HTC Master form" version="7.0">            
+                <sheet>
+                    <group>
+						<group name="main_grp" string="DHL Link Info">
+			                <field name="filename"/>
+			                <field name="md5checksum"/>
+			                <field name="filesize"/>
+			                <field name="category"/>
+			                <field name="direction"/>
+                        </group>          
+                        <group name="origin_grp" string="EDI Details">
+			                <field name="modifytime"/>
+			                <field name="createtime"/>
+			                <field name="gentime"/>                                                                            
+                        </group>           
+                    </group>
+                </sheet>              
+                </form>
+            </field>
+        </record>       	
+		
+        <record id="view_htc_master_search" model="ir.ui.view">
+            <field name="name">htc.master.search</field>
+            <field name="model">htc.master</field>
+            <field name="arch" type="xml">
+                <search string="htc master">
+                    <field name="filename"/>
+                    <filter string="Out Messages" domain="[('direction', '=', 'Out')]"
+                            help="Slimming Messages sent to DHL Link"/>
+                    <filter string="Customer" domain="[('category', '=', 'C')]"
+                            help="Customer Master Overview"/>
+                    <filter string="Item" domain="[('category', '=', 'I')]"
+                            help="Item Master Overview"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Generate Time" help="Group by Generate Time" context="{'group_by': 'gentime'}"/>
+                    </group>
+                </search>                
+            </field>
+        </record>      		        
+        
+        <record id="action_htc_master_tree" model="ir.actions.act_window">
+            <field name="name">Master Data</field>
+            <field name="res_model">htc.master</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_htc_master_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create an HTC_Master record. 
+              </p><p>
+                Overview of HTC Master file I/O                
+              </p>
+            </field>
+        </record>
+                                
+    	<menuitem action="action_htc_master_tree" id="menu_action_htc_master_tree" parent="menu_htc_edi" sequence="1"/>
+    	
+    	
+<!--
+    Customer Master
+-->		     
+        <record id="view_htc_customer_tree" model="ir.ui.view">
+            <field name="name">htc.customer.tree</field>
+            <field name="model">htc.customer</field>
+            <field name="arch" type="xml">
+	            <tree colors="red:mdftime > '2001-1-1';" string="HTC Customer Lines">
+	                <field name="customer_id"/>
+	                <field name="customer_name"/>
+	                <field name="customer_contact_person"/>
+	                <field name="customer_addr_code"/>
+	                <field name="customer_addr"/>
+	                <field name="customer_contact_name"/>
+	                <field name="customer_tel"/>                               
+	                <field name="mdftime"/>
+	                <field name="gentime"/>	
+	            </tree>
+            </field>
+        </record>    
+                
+		<record id="view_htc_customer_form" model="ir.ui.view">
+            <field name="name">htc.customer.form</field>
+            <field name="model">htc.customer</field>	
+            <field name="arch" type="xml">
+                <form string="HTC customer form" version="7.0">            
+                <sheet>
+                    <group>
+						<group name="main_grp" string="DHL Link Info">
+                            <field name="customer_id"/>
+                            <field name="customer_name"/>
+                            <field name="customer_contact_person"/>
+                            <field name="customer_addr_code"/>
+                            <field name="customer_addr"/>
+                            <field name="customer_contact_name"/>
+                            <field name="customer_tel"/>
+                        </group>          
+                        <group name="origin_grp" string="EDI Details">
+                            <field name="mdftime"/>
+                            <field name="gentime"/>                                                                               
+                        </group>           
+                    </group>
+                </sheet>              
+                </form>
+            </field>
+        </record>       	
+		
+        <record id="view_htc_customer_search" model="ir.ui.view">
+            <field name="name">htc.customer.search</field>
+            <field name="model">htc.customer</field>
+            <field name="arch" type="xml">
+                <search string="htc customer">
+                	<field name="customer_id"/>
+                    <field name="customer_addr_code"/>
+                    <filter string="New Customer" domain="[('mdftime', '>', '2001-1-1')]"
+                            help="Customer has been added or changed since last update"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Customer Code" help="By Customer Code" context="{'group_by': 'customer_id'}"/>
+                    </group>
+                </search>                
+            </field>
+        </record>      		        
+        
+        <record id="action_htc_customer_tree" model="ir.actions.act_window">
+            <field name="name">Customer_H_3PL</field>
+            <field name="res_model">htc.customer</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_htc_customer_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create an EDI record. 
+              </p><p>
+                Most operations are prepared automatically by EDI Tools,
+                so you needn't record manual EDI status.
+              </p>
+            </field>
+        </record>
+                                
+    	<menuitem action="action_htc_customer_tree" id="menu_action_htc_customer_tree" parent="menu_htc_edi" sequence="2"/>
+        
+<!--
+    Item Master
+-->		     
+        <record id="view_htc_item_tree" model="ir.ui.view">
+            <field name="name">htc.item.tree</field>
+            <field name="model">htc.item</field>
+            <field name="arch" type="xml">
+	            <tree colors="red:mdftime > '2001-1-1';" string="HTC item Lines">
+	                <field name="htcpartno"/>
+	                <field name="partdescription"/>
+	                <field name="modelname"/>
+	                <field name="color"/>
+	                <field name="packdefinition"/>
+	                <field name="palletdefinition"/>                            
+	                <field name="mdftime"/>
+	                <field name="gentime"/>	
+	            </tree>
+            </field>
+        </record>    
+  
+  
+		<record id="view_htc_item_form" model="ir.ui.view">
+            <field name="name">htc.item.form</field>
+            <field name="model">htc.item</field>	
+            <field name="arch" type="xml">
+                <form string="HTC item form" version="7.0">            
+                <sheet>
+                    <group>
+						<group name="main_grp" string="DHL Link Info">
+							<field name="htcpartno"/>
+							<field name="partdescription"/>
+							<field name="modelname"/>
+							<field name="color"/>
+							<field name="packdefinition"/>
+							<field name="palletdefinition"/>  
+                        </group>          
+                        <group name="origin_grp" string="EDI Details">
+                            <field name="mdftime"/>
+                            <field name="gentime"/>                                                                               
+                        </group>           
+                    </group>
+                </sheet>              
+                </form>
+            </field>
+        </record>       	
+		
+        <record id="view_htc_item_search" model="ir.ui.view">
+            <field name="name">htc.item.search</field>
+            <field name="model">htc.item</field>
+            <field name="arch" type="xml">
+                <search string="htc item">
+                	<field name="htcpartno"/>
+                	<filter string="New Item" domain="[('mdftime', '>', '2001-1-1')]"
+                            help="Item has been added or changed since last update"/>
+                </search>                
+            </field>
+        </record>      		        
+        
+        <record id="action_htc_item_tree" model="ir.actions.act_window">
+            <field name="name">Item_H_3PL</field>
+            <field name="res_model">htc.item</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_htc_item_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create an EDI record. 
+              </p><p>
+                HTC Item Master,
+                so you needn't record manual EDI status.
+              </p>
+            </field>
+        </record>
+                                
+    	<menuitem action="action_htc_item_tree" id="menu_action_htc_item_tree" parent="menu_htc_edi" sequence="3"/>        
+        
+    </data>
+</openerp>
