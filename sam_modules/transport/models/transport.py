@@ -34,7 +34,8 @@ class transport_session(osv.osv):
         'duration': fields.float(string="duration", digits=(6, 2), help="Duration in days"),
         'seats': fields.integer(string="Number of seats"),
         
-        'instructor_id': fields.many2one('res.partner', string="Instructor"),
+        'instructor_id': fields.many2one('res.partner', string="Instructor", domain=['|', ('instructor', '=', True),
+                     ('category_id.name', 'ilike', "Teacher")]),
         'course_id': fields.many2one('transport.course',ondelete='cascade', string="Course", required=True),
         'attendee_ids': fields.many2many('res.partner', string="Attendees"),
     }
