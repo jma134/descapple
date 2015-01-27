@@ -9,6 +9,8 @@ import logging
 _logger = logging.getLogger(__name__)
 
 from openerp import models, api, exceptions
+from datetime import timedelta
+from openerp import fields as FD
 
 #----------------------------------------------------------
 # Transport Course 
@@ -68,9 +70,45 @@ class transport_session(osv.osv):
         'attendee_ids': fields.many2many('res.partner', string="Attendees"),
         
         'taken_seats': fields.float(string="Taken seats", compute='_taken_seats'),
+        'end_date': fields.date(string="End Date", store=True, compute='_get_end_date', inverse='_set_end_date'),
+        'hours': fields.float(string="Duration in hours", compute='_get_hours', inverse='_set_hours'),
         
     }
     
+    @api.one
+    @api.depends('start_date', 'duration')
+    def _get_end_date(self):
+        if not (self.start_date and self.duration):
+            self.end_date = self.start_date
+            return
+
+        # Add duration to start_date, but: Monday + 5 days = Saturday, so
+        # subtract one second to get on Friday instead
+        start = FD.Datetime.from_string(self.start_date)
+        duration = timedelta(days=self.duration, seconds=-1)
+        self.end_date = start + duration
+        
+    @api.one
+    def _set_end_date(self):
+        if not (self.start_date and self.end_date):
+            return
+
+        # Compute the difference between dates, but: Friday - Monday = 4 days,
+        # so add one day to get 5 days instead
+        start_date = FD.Datetime.from_string(self.start_date)
+        end_date = FD.Datetime.from_string(self.end_date)
+        self.duration = (end_date - start_date).days + 1
+        
+    @api.one
+    @api.depends('duration')
+    def _get_hours(self):
+        self.hours = self.duration * 24
+        
+    @api.one
+    def _set_hours(self):
+        self.duration = self.hours / 24
+        
+        
     @api.one
     @api.depends('seats', 'attendee_ids')
     def _taken_seats(self):
