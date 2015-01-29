@@ -63,6 +63,7 @@ class transport_session(osv.osv):
         'duration': fields.float(string="duration", digits=(6, 2), help="Duration in days"),
         'seats': fields.integer(string="Number of seats"),
         'active': fields.boolean(string="Active", default=True), 
+        'color': fields.integer(),
         
         'instructor_id': fields.many2one('res.partner', string="Instructor", domain=['|', ('instructor', '=', True),
                      ('category_id.name', 'ilike', "Teacher")]),
@@ -73,7 +74,26 @@ class transport_session(osv.osv):
         'end_date': fields.date(string="End Date", store=True, compute='_get_end_date', inverse='_set_end_date'),
         'hours': fields.float(string="Duration in hours", compute='_get_hours', inverse='_set_hours'),
         
+        'attendees_count': fields.integer(string="Attendees count", compute='_get_attendees_count', store=True),
+        'state': fields.selection([('draft', "Draft"),
+                                   ('confirmed', "Confirmed"),
+                                   ('done', "Done"),
+                                   ]),
     }
+    
+    @api.one
+    def action_draft(self):
+        self.state = 'draft'
+        
+    @api.one
+    def action_confirm(self):
+        self.state = 'confirmed'
+        
+    @api.one
+    def action_done(self):
+        self.state = 'done'
+        
+        
     
     @api.one
     @api.depends('start_date', 'duration')
@@ -108,6 +128,10 @@ class transport_session(osv.osv):
     def _set_hours(self):
         self.duration = self.hours / 24
         
+    @api.one
+    @api.depends('attendee_ids')
+    def _get_attendees_count(self):
+        self.attendees_count = len(self.attendee_ids)
         
     @api.one
     @api.depends('seats', 'attendee_ids')

@@ -37,6 +37,7 @@
         #'wizard/vmi_location_product_view.xml',
         'views/transport_view.xml',
         'views/partner.xml',
+        'views/session_workflow.xml',
     ],
     'installable': True,
 #    'application': True,
