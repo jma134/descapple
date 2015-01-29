@@ -2,10 +2,11 @@
 
 import models
 from models import partner
+from wizard import wizard
 # import product
 #import report
 #import res_config
-import wizard
+# import wizard
 
 
 

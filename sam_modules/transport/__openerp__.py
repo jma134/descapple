@@ -33,6 +33,7 @@
     'category': 'Transport Platform',
     'sequence': 18,
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         #'wizard/vmi_location_product_view.xml',
         'views/transport_view.xml',
