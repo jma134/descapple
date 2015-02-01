@@ -324,11 +324,14 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar,gantt,graph,kanban</field>
         </record>
-
-        <menuitem id="session_menu" name="Sessions"
-                  parent="menu_transport_edi"
-                  action="session_list_action"/>
-                  
+        
+        <menuitem id="session_menu" name="Session" parent="menu_transport_edi"
+                  action="session_list_action"/>      
+        
+        
+        
+        
+                          
 		<!-- wizard -->                  
         <record model="ir.ui.view" id="wizard_form_view">
             <field name="name">wizard.form</field>
@@ -355,6 +358,44 @@
                     res_model="transport.wizard"
                     view_mode="form"
                     target="new"
-                    key2="client_action_multi"/>                          
+                    key2="client_action_multi"/>
+                    
+                    
+		<record model="ir.ui.view" id="wizard_with_step_form">
+		    <field name="name">mywizard.form</field>
+		    <field name="model">transport.mywizard</field>
+		    <field name="type">form</field>
+		    <field name="arch" type="xml">
+		      <form string="Wizard with step" version="7.0">
+		       <field invisible="1" name="state" />             
+		
+		          <group states="step1">
+		          <field name="name1" />                
+		          </group>
+		
+		          <group states="step2">
+		          <field name="name2" />                
+		          </group>
+		
+		          <footer states="step1">
+		            <button name="action_next" string="Next" type="object" />
+		          </footer>
+		
+		          <footer states="step2">
+		            <button name="action_previous" string="Previous" type="object" />
+		          </footer>
+		
+		      </form>
+		    </field>
+	   </record>
+	   
+	   <act_window id="launch_mywizard"
+                    name="Add Wizard"
+                    src_model="transport.session"
+                    res_model="transport.mywizard"
+                    view_mode="form"
+                    target="new"
+                    key2="client_action_multi"/>                 
+                                 
     </data>
 </openerp>
