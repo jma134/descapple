@@ -162,7 +162,20 @@ class transport_session(osv.osv):
     @api.constrains('instructor_id', 'attendee_ids')
     def _check_instructor_not_in_attendees(self):
         if self.instructor_id and self.instructor_id in self.attendee_ids:
-            raise exceptions.ValidationError("A session's instructor can't be an attendee")   
+            raise exceptions.ValidationError("A session's instructor can't be an attendee")
+    
+    def do_session_test(self, cr, uid, session, context=None):
+        if not context:
+            context = {}
+
+        context.update({
+            'active_model': self._name,
+            'active_ids': session,
+            'active_id': len(session) and session[0] or False
+        })
+
+        created_id = self.pool['stock.transfer_details'].create(cr, uid, {'picking_id': len(picking) and picking[0] or False}, context)
+        return self.pool['stock.transfer_details'].wizard_view(cr, uid, created_id, context)
             
 #----------------------------------------------------------
 # Transport EDI 

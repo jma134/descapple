@@ -184,6 +184,7 @@
             <field name="arch" type="xml">
                 <form string="Session Form">
                 	<header>
+                		<button name="do_session_test" string="SessionTest" type="object" class="oe_highlight"/>
                         <button name="draft" type="workflow"
                                 string="Reset to draft"
                                 states="confirmed,done"/>
