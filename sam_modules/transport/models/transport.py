@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv, fields
+from openerp.osv import osv
+from openerp.osv import fields as FD
+
 from openerp.tools.translate import _
 import openerp.addons.decimal_precision as dp
 from openerp import tools
@@ -8,9 +10,9 @@ import time
 import logging
 _logger = logging.getLogger(__name__)
 
-from openerp import models, api, exceptions
+from openerp import models, fields, api, exceptions
 from datetime import timedelta
-from openerp import fields as FD
+
 
 #----------------------------------------------------------
 # Transport Course 
@@ -19,12 +21,12 @@ class transport_course(osv.osv):
     _name = 'transport.course'
 
     _columns = {
-        'name': fields.char(string="Title", required=True),
-        'description': fields.text(string="description"),
+        'name': FD.char(string="Title", required=True),
+        'description': FD.text(string="description"),
         
-        'responsible_id': fields.many2one('res.users',ondelete='set null', string="Responsible", index=True),
-        'session_ids': fields.one2many('transport.session', 'course_id', string="Sessions"),
-        'attendee_ids': fields.many2many('res.partner', string="Attendees"),
+        'responsible_id': FD.many2one('res.users',ondelete='set null', string="Responsible", index=True),
+        'session_ids': FD.one2many('transport.session', 'course_id', string="Sessions"),
+        'attendee_ids': FD.many2many('res.partner', string="Attendees"),
     }
     
     @api.one
@@ -58,24 +60,24 @@ class transport_session(osv.osv):
     _name = 'transport.session'
 
     _columns = {
-        'name': fields.char(string="Session", required=True),
-        'start_date': fields.date(string="start_date"),
-        'duration': fields.float(string="duration", digits=(6, 2), help="Duration in days"),
-        'seats': fields.integer(string="Number of seats"),
-        'active': fields.boolean(string="Active", default=True), 
-        'color': fields.integer(),
+        'name': FD.char(string="Session", required=True),
+        'start_date': FD.date(string="start_date"),
+        'duration': FD.float(string="duration", digits=(6, 2), help="Duration in days"),
+        'seats': FD.integer(string="Number of seats"),
+        'active': FD.boolean(string="Active", default=True), 
+        'color': FD.integer(),
         
-        'instructor_id': fields.many2one('res.partner', string="Instructor", domain=['|', ('instructor', '=', True),
+        'instructor_id': FD.many2one('res.partner', string="Instructor", domain=['|', ('instructor', '=', True),
                      ('category_id.name', 'ilike', "Teacher")]),
-        'course_id': fields.many2one('transport.course',ondelete='cascade', string="Course", required=True),
-        'attendee_ids': fields.many2many('res.partner', string="Attendees"),
+        'course_id': FD.many2one('transport.course',ondelete='cascade', string="Course", required=True),
+        'attendee_ids': FD.many2many('res.partner', string="Attendees"),
         
-        'taken_seats': fields.float(string="Taken seats", compute='_taken_seats'),
-        'end_date': fields.date(string="End Date", store=True, compute='_get_end_date', inverse='_set_end_date'),
-        'hours': fields.float(string="Duration in hours", compute='_get_hours', inverse='_set_hours'),
+        'taken_seats': FD.float(string="Taken seats", compute='_taken_seats'),
+        'end_date': FD.date(string="End Date", store=True, compute='_get_end_date', inverse='_set_end_date'),
+        'hours': FD.float(string="Duration in hours", compute='_get_hours', inverse='_set_hours'),
         
-        'attendees_count': fields.integer(string="Attendees count", compute='_get_attendees_count', store=True),
-        'state': fields.selection([('draft', "Draft"),
+        'attendees_count': FD.integer(string="Attendees count", compute='_get_attendees_count', store=True),
+        'state': FD.selection([('draft', "Draft"),
                                    ('confirmed', "Confirmed"),
                                    ('done', "Done"),
                                    ]),
@@ -162,20 +164,7 @@ class transport_session(osv.osv):
     @api.constrains('instructor_id', 'attendee_ids')
     def _check_instructor_not_in_attendees(self):
         if self.instructor_id and self.instructor_id in self.attendee_ids:
-            raise exceptions.ValidationError("A session's instructor can't be an attendee")
-    
-    def do_session_test(self, cr, uid, session, context=None):
-        if not context:
-            context = {}
-
-        context.update({
-            'active_model': self._name,
-            'active_ids': session,
-            'active_id': len(session) and session[0] or False
-        })
-
-        created_id = self.pool['stock.transfer_details'].create(cr, uid, {'picking_id': len(picking) and picking[0] or False}, context)
-        return self.pool['stock.transfer_details'].wizard_view(cr, uid, created_id, context)
+            raise exceptions.ValidationError("A session's instructor can't be an attendee")   
             
 #----------------------------------------------------------
 # Transport EDI 
@@ -187,30 +176,30 @@ class transport_edi(osv.osv):
      
 
     _columns = {
-        'name': fields.char('BizNo', size=16, select=True, readonly=True),
-        'category': fields.char('EDI', size=6, select=True, readonly=True),
-        'msgid': fields.char('MsgID', size=50, readonly=True),
-        'fname': fields.char('FileName', size=100, readonly=True),
-        'isa': fields.char('ISA#', size=9, select=True, readonly=True),
-        'recvtime': fields.datetime('ReceiveTime', help="DHL Link EDI Receive Time", readonly=True),
-        'sendtime': fields.datetime('SendTime', help="DHL Link EDI Send Time", readonly=True),
-        'exception': fields.char('ExceptionID', size=10, readonly=True),        
-        'email': fields.char('Email', size=30, readonly=True),        
-        'remark': fields.char('Remark', size=200, readonly=True),        
-        'hawb': fields.char('HAWB', size=50, readonly=True),
-        'eventcd': fields.char('EventCode', size=3, readonly=True),
-        'eventdate': fields.char('EventDate', size=16, readonly=True),
-        'city': fields.char('City', size=32, readonly=True),
-        'gweight': fields.float('G.Weight', digits_compute=dp.get_precision('Product Unit of Measure'), readonly=True),
-        'partno': fields.char('Part#', size=16, readonly=True),
-        'qty': fields.float('Qty', digits_compute=dp.get_precision('Product Unit of Measure'), readonly=True),        
-        'gentime': fields.datetime('GenTime', select=True, readonly=True),
-        'state': fields.selection([('draft', 'New'),
+        'name': FD.char('BizNo', size=16, select=True, readonly=True),
+        'category': FD.char('EDI', size=6, select=True, readonly=True),
+        'msgid': FD.char('MsgID', size=50, readonly=True),
+        'fname': FD.char('FileName', size=100, readonly=True),
+        'isa': FD.char('ISA#', size=9, select=True, readonly=True),
+        'recvtime': FD.datetime('ReceiveTime', help="DHL Link EDI Receive Time", readonly=True),
+        'sendtime': FD.datetime('SendTime', help="DHL Link EDI Send Time", readonly=True),
+        'exception': FD.char('ExceptionID', size=10, readonly=True),        
+        'email': FD.char('Email', size=30, readonly=True),        
+        'remark': FD.char('Remark', size=200, readonly=True),        
+        'hawb': FD.char('HAWB', size=50, readonly=True),
+        'eventcd': FD.char('EventCode', size=3, readonly=True),
+        'eventdate': FD.char('EventDate', size=16, readonly=True),
+        'city': FD.char('City', size=32, readonly=True),
+        'gweight': FD.float('G.Weight', digits_compute=dp.get_precision('Product Unit of Measure'), readonly=True),
+        'partno': FD.char('Part#', size=16, readonly=True),
+        'qty': FD.float('Qty', digits_compute=dp.get_precision('Product Unit of Measure'), readonly=True),        
+        'gentime': FD.datetime('GenTime', select=True, readonly=True),
+        'state': FD.selection([('draft', 'New'),
                                    ('done', 'Done'),
                                    ], 'Status', readonly=True, select=True,
                  help= "* New: When the EDI is created and not yet confirmed.\n"\
                        "* Done: When the EDI is completed & arichived, the state is \'Done\'."),          
-        'note': fields.text('Notes'),
+        'note': FD.text('Notes'),
     }
     _defaults = {
         'state': 'draft',
@@ -220,5 +209,33 @@ class transport_edi(osv.osv):
     _log_access = False
     
 
+#----------------------------------------------------------
+# Transport SLD 
+#----------------------------------------------------------
+class transport_sld(models.TransientModel):
+    _name = 'transport.sld'
 
+#     def _default_sessions(self):
+#         return self.env['transport.session'].browse(self._context.get('active_ids'))
+#     
+        
+    org = fields.Char(string="Origin", required=True, size=4)
+    dst = fields.Char(string="Destination", required=True, size=4)
+    itinerary = fields.Char(string="Itinerary", compute='_itinerary', readonly=True)
+    dstprovince = fields.Char(string="Province", size=30)
+    tt = fields.Float(string="Transit Time", digits=(5, 1), help="Transit Time in days")
+    
+    _defaults = {
+        'itinerary': "/",
+    }
+#     attendee_ids = fields.Many2many('res.partner', string="Attendees")
+    
+    @api.one
+    @api.depends('org', 'dst')
+    def _itinerary(self):
+        if not (self.org or self.dst):
+            self.itinerary = self.org + self.dst
+
+    
+    
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

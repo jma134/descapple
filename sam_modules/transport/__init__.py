@@ -3,7 +3,6 @@
 import models
 from models import partner
 from wizard import wizard
-from wizard import mywizard
 # import product
 #import report
 #import res_config
