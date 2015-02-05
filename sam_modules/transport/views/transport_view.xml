@@ -209,6 +209,9 @@
                                 <field name="duration"/>
                                 <field name="seats"/>
                                 <field name="taken_seats" widget="progressbar"/>
+                                <field name="org"/>
+	                            <field name="dst"/>
+	                            <field name="itinerary"/>
                             </group>
 
                             <label for="attendee_ids"/>
@@ -335,6 +338,20 @@
 <!--
     Transport SLD
 -->	
+		<record  model="ir.ui.view" id="view_transport_sld_tree">
+            <field name="name">transport.sld.tree</field>
+            <field name="model">transport.sld</field>
+            <field name="arch" type="xml">
+                <tree string="SLD Tree" colors="#0000ff:tt&lt;2;red:tt&gt;3">
+                    <field name="org"/>
+                    <field name="dst"/>                    
+                    <field name="itinerary"/>
+                    <field name="tt"/>
+                    <field name="dstprovince"/>
+                </tree>
+            </field>
+        </record>
+        
 		<record model="ir.ui.view" id="view_transport_sld_form">
             <field name="name">transport.sld.form</field>
             <field name="model">transport.sld</field>

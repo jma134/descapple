@@ -83,6 +83,27 @@ class transport_session(osv.osv):
                                    ]),
     }
     
+    org = fields.Char(string="Origin", required=True, size=4)
+    dst = fields.Char(string="Destination", required=True, size=4)
+    itinerary = fields.Char(string="Itinerary", compute='_itinerary')
+    
+
+    @api.one
+    @api.depends('org', 'dst')
+    def _itinerary(self):
+        print self.org
+#         if self.org:
+#             s1 = self.org
+#         else:
+#             s1 = ''
+        s1 = self.org and self.org or ''
+        if self.dst:
+            s2 = self.dst
+        else:
+            s2 = ''
+         
+        self.itinerary = s1 + s2
+            
     @api.one
     def action_draft(self):
         self.state = 'draft'
@@ -212,7 +233,7 @@ class transport_edi(osv.osv):
 #----------------------------------------------------------
 # Transport SLD 
 #----------------------------------------------------------
-class transport_sld(models.TransientModel):
+class transport_sld(models.Model):
     _name = 'transport.sld'
 
 #     def _default_sessions(self):
@@ -221,20 +242,26 @@ class transport_sld(models.TransientModel):
         
     org = fields.Char(string="Origin", required=True, size=4)
     dst = fields.Char(string="Destination", required=True, size=4)
-    itinerary = fields.Char(string="Itinerary", compute='_itinerary', readonly=True)
+    itinerary = fields.Char(string="Itinerary", compute='_itinerary')
     dstprovince = fields.Char(string="Province", size=30)
     tt = fields.Float(string="Transit Time", digits=(5, 1), help="Transit Time in days")
     
     _defaults = {
-        'itinerary': "/",
+        'itinerary': "SHA",
     }
 #     attendee_ids = fields.Many2many('res.partner', string="Attendees")
     
     @api.one
     @api.depends('org', 'dst')
     def _itinerary(self):
-        if not (self.org or self.dst):
-            self.itinerary = self.org + self.dst
+        s1 = self.org and self.org or ''
+        if self.dst:
+            s2 = self.dst
+        else:
+            s2 = ''
+         
+        self.itinerary = s1 + s2
+        #self.itinerary = self.org and self.org or '' + self.dst and self.dst or ''
 
     
     
