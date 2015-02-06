@@ -359,12 +359,26 @@
                 <form string="Course Form">
                     <sheet>
 						<group>
-                            <field name="org"/>
-                            <field name="dst"/>
-                            <field name="itinerary"/>
-                            <field name="dstprovince"/>
-                            <field name="tt"/>
+
                         </group>                        
+                    </sheet>
+                    <sheet>
+                        <group>
+                            <group string="General">
+                                <field name="partner_id"/>
+                                <field name="partner_name"/>
+                                <field name="contact_name"/>
+                            </group>
+                            <group string="Schedule">
+	                            <field name="org"/>
+	                            <field name="dst"/>
+	                            <field name="itinerary"/>
+	                            <field name="dstprovince"/>
+	                            <field name="tt"/>
+                            </group>
+
+
+                        </group>
                     </sheet>
                 </form>
             </field>

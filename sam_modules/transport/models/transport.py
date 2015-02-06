@@ -239,7 +239,11 @@ class transport_sld(models.Model):
 #     def _default_sessions(self):
 #         return self.env['transport.session'].browse(self._context.get('active_ids'))
 #     
-        
+    partner_id = fields.Many2one('res.partner', 'Partner', ondelete='set null', track_visibility='onchange',
+            select=True, help="Linked partner (optional). Usually created when converting the lead.")
+    contact_name = fields.Char('Contact Name', size=64)
+    partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
+
     org = fields.Char(string="Origin", required=True, size=4)
     dst = fields.Char(string="Destination", required=True, size=4)
     itinerary = fields.Char(string="Itinerary", compute='_itinerary')
@@ -251,6 +255,18 @@ class transport_sld(models.Model):
     }
 #     attendee_ids = fields.Many2many('res.partner', string="Attendees")
     
+    def on_change_partner_id(self, cr, uid, ids, partner_id, context=None):
+        values = {}
+        print partner_id
+        
+        if partner_id:
+            partner = self.pool.get('res.partner').browse(cr, uid, partner_id, context=context)
+            values = {
+                'partner_name': partner.parent_id.name if partner.parent_id else partner.name,
+                'contact_name': partner.name if partner.parent_id else False,
+            }
+        return {'value': values}
+        
     @api.one
     @api.depends('org', 'dst')
     def _itinerary(self):
