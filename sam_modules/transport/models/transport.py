@@ -235,6 +235,7 @@ class transport_edi(osv.osv):
 #----------------------------------------------------------
 class transport_sld(models.Model):
     _name = 'transport.sld'
+    _inherit = ['mail.thread']
 
 #     def _default_sessions(self):
 #         return self.env['transport.session'].browse(self._context.get('active_ids'))

@@ -358,14 +358,16 @@
             <field name="arch" type="xml">
                 <form string="Course Form">
                     <sheet>
-						<group>
-
-                        </group>                        
-                    </sheet>
-                    <sheet>
                         <group>
-                            <group string="General">
-                                <field name="partner_id"/>
+                            <group string="General">                                
+                                <field name="partner_id" string="Customer"
+                                	on_change="on_change_partner_id(partner_id)"                                	
+                                	/>
+                            
+								<!-- <field string="Supplier" name="partner_id"
+                              		on_change="onchange_partner_id(type, partner_id, date_invoice, payment_term, partner_bank_id, company_id, context)"
+                              		context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}"
+                              		domain="[('supplier', '=', True)]"/> -->
                                 <field name="partner_name"/>
                                 <field name="contact_name"/>
                             </group>
