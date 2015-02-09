@@ -244,17 +244,28 @@ class transport_sld(models.Model):
             select=True, help="Linked partner (optional). Usually created when converting the lead.")
     contact_name = fields.Char('Contact Name', size=64)
     partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
-
+    
     org = fields.Char(string="Origin", required=True, size=4)
     dst = fields.Char(string="Destination", required=True, size=4)
     itinerary = fields.Char(string="Itinerary", compute='_itinerary')
     dstprovince = fields.Char(string="Province", size=30)
     tt = fields.Float(string="Transit Time", digits=(5, 1), help="Transit Time in days")
+    is_test = fields.Boolean('Is a Test', help="Check if the contact is a company, otherwise it is a person")
+
     
     _defaults = {
         'itinerary': "SHA",
     }
 #     attendee_ids = fields.Many2many('res.partner', string="Attendees")
+
+    @api.multi
+    def onchange_type(self, is_company):        
+        if is_test:
+            domain = {'title': [('domain', '=', 'partner')]}
+        else:
+            domain = {'title': [('domain', '=', 'contact')]}
+        return {'domain': domain}
+    
     
     def on_change_partner_id(self, cr, uid, ids, partner_id, context=None):
         values = {}

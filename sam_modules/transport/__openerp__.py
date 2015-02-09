@@ -31,7 +31,7 @@
     'images': ['images/vmi.jpg'],
     'depends': ['product', 'account'],
     'category': 'Transport Platform',
-    'sequence': 18,
+    'sequence': 1,
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

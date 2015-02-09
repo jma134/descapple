@@ -375,7 +375,12 @@
 	                            <field name="org"/>
 	                            <field name="dst"/>
 	                            <field name="itinerary"/>
-	                            <field name="dstprovince"/>
+	                            <field name="is_test"/>
+	                            <field name="dstprovince"
+		                            placeholder="Company"
+		                            domain="[('is_test', '=', True)]" attrs="{'invisible': [('is_test','=', True)]}"
+		                            on_change="onchange_type(org)"/>
+
 	                            <field name="tt"/>
                             </group>
 
