@@ -291,6 +291,138 @@ class transport_sld(models.Model):
         self.itinerary = s1 + s2
         #self.itinerary = self.org and self.org or '' + self.dst and self.dst or ''
 
+
+#----------------------------------------------------------
+# Transport order 
+#----------------------------------------------------------
+class transport_order(models.Model):
+    _name = "transport.order"
+    _inherit = ['mail.thread', 'ir.needaction_mixin']
+    _description = "Transport Order"
+    _order = 'eta desc, id desc'
     
+    STATE_SELECTION = [
+        ('draft', 'Draft'),
+        ('sent', 'PreAlert'),
+        ('confirmed', 'Confirmed'),
+#         ('approved', 'Purchase Confirmed'),
+        ('picking', 'Shipping'),
+        ('pod', 'POD'),
+        ('done', 'Done'),
+        ('cancel', 'Cancelled')
+    ]
+        
+    dn = fields.Integer('Delivery No.', select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
+    cnee_name = fields.Char('Name1', size=128)
+    sales_doc = fields.Char('Sales Doc', size=10)
+    pono = fields.Char('Purchase Order#', size=32)
+    partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
+    material = fields.Char('Material', size=32)
+    materialdesc = fields.Char('Material Desc#', size=32)
+    qty = fields.Integer('Dlvy Qty')
+    plt_qty = fields.Integer('Plt Qty')
+    hawb = fields.Char('HAWB', size=23 select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
+    pickupdate = fields.Datetime('Pickup Date', help="Pickup Date, usually the time DESC pickup @ SLC", select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}),
+    eta = fields.Date('ETA', compute='_eta')          
+    state = fields.Selection(STATE_SELECTION, 'Status', readonly=True,
+                                  help="The status of the transport order. "
+                                       "A request for quotation is a purchase order in a 'Draft' status. "
+                                       "Then the order has to be confirmed by the user, the status switch "
+                                       "to 'Confirmed'. Then the supplier must confirm the order to change "
+                                       "the status to 'Approved'. When the purchase order is paid and "
+                                       "received, the status becomes 'Done'. If a cancel action occurs in "
+                                       "the invoice or in the receipt of goods, the status becomes "
+                                       "in exception.",
+                                  select=True, copy=False)
+    
+    
+    
+    
+#     partner_id = fields.Many2one('res.partner', 'Partner', ondelete='set null', track_visibility='onchange',
+#             select=True, help="Linked partner (optional). Usually created when converting the lead.")
+#     contact_name = fields.Char('Contact Name', size=64)
+#     partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
+#     
+#     org = fields.Char(string="Origin", required=True, size=4)
+#     dst = fields.Char(string="Destination", required=True, size=4)
+#     itinerary = fields.Char(string="Itinerary", compute='_itinerary')
+#     dstprovince = fields.Char(string="Province", size=30)
+#     tt = fields.Float(string="Transit Time", digits=(5, 1), help="Transit Time in days")
+#     is_test = fields.Boolean('Is a Test', help="Check if the contact is a company, otherwise it is a person")
+#     
+#     eta = fields.function(get_eta_date, multi="min_max_date", fnct_inv=_set_min_date,
+#                  store={'stock.move': (_get_pickings, ['date_expected', 'picking_id'], 20)}, type='datetime', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, string='ETA', select=True, help="Scheduled time for Arrival")
+#                  
+#     _columns = {
+#         'name': fields.char('Reference', select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False),
+#         'origin': fields.char('Source Document', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, help="Reference of the document", select=True),
+#         'backorder_id': fields.many2one('stock.picking', 'Back Order of', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, help="If this shipment was split, then this field links to the shipment which contains the already processed part.", select=True, copy=False),
+#         'note': fields.text('Notes', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}),
+#         'move_type': fields.selection([('direct', 'Partial'), ('one', 'All at once')], 'Delivery Method', required=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, help="It specifies goods to be deliver partially or all at once"),
+#         'state': fields.function(_state_get, type="selection", copy=False,
+#             store={
+#                 'stock.picking': (lambda self, cr, uid, ids, ctx: ids, ['move_type'], 20),
+#                 'stock.move': (_get_pickings, ['state', 'picking_id', 'partially_available'], 20)},
+#             selection=[
+#                 ('draft', 'Draft'),
+#                 ('cancel', 'Cancelled'),
+#                 ('waiting', 'Waiting Another Operation'),
+#                 ('confirmed', 'Waiting Availability'),
+#                 ('partially_available', 'Partially Available'),
+#                 ('assigned', 'Ready to Transfer'),
+#                 ('done', 'Transferred'),
+#                 ], string='Status', readonly=True, select=True, track_visibility='onchange',
+#             help="""
+#                 * Draft: not confirmed yet and will not be scheduled until confirmed\n
+#                 * Waiting Another Operation: waiting for another move to proceed before it becomes automatically available (e.g. in Make-To-Order flows)\n
+#                 * Waiting Availability: still waiting for the availability of products\n
+#                 * Partially Available: some products are available and reserved\n
+#                 * Ready to Transfer: products reserved, simply waiting for confirmation.\n
+#                 * Transferred: has been processed, can't be modified or cancelled anymore\n
+#                 * Cancelled: has been cancelled, can't be confirmed anymore"""
+#         ),
+#         'priority': fields.function(get_min_max_date, multi="min_max_date", fnct_inv=_set_priority, type='selection', selection=procurement.PROCUREMENT_PRIORITIES, string='Priority',
+#                                     store={'stock.move': (_get_pickings, ['priority', 'picking_id'], 20)}, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, select=1, help="Priority for this picking. Setting manually a value here would set it as priority for all the moves",
+#                                     track_visibility='onchange', required=True),
+#         'min_date': fields.function(get_min_max_date, multi="min_max_date", fnct_inv=_set_min_date,
+#                  store={'stock.move': (_get_pickings, ['date_expected', 'picking_id'], 20)}, type='datetime', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, string='Scheduled Date', select=1, help="Scheduled time for the first part of the shipment to be processed. Setting manually a value here would set it as expected date for all the stock moves.", track_visibility='onchange'),
+#         'max_date': fields.function(get_min_max_date, multi="min_max_date",
+#                  store={'stock.move': (_get_pickings, ['date_expected', 'picking_id'], 20)}, type='datetime', string='Max. Expected Date', select=2, help="Scheduled time for the last part of the shipment to be processed"),
+#         'date': fields.datetime('Creation Date', help="Creation Date, usually the time of the order", select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, track_visibility='onchange'),
+#         'date_done': fields.datetime('Date of Transfer', help="Date of Completion", states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False),
+#         'move_lines': fields.one2many('stock.move', 'picking_id', 'Internal Moves', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=True),
+#         'quant_reserved_exist': fields.function(_get_quant_reserved_exist, type='boolean', string='Quant already reserved ?', help='technical field used to know if there is already at least one quant reserved on moves of a given picking'),
+#         'partner_id': fields.many2one('res.partner', 'Partner', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}),
+#         'company_id': fields.many2one('res.company', 'Company', required=True, select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}),
+#         'pack_operation_ids': fields.one2many('stock.pack.operation', 'picking_id', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, string='Related Packing Operations'),
+#         'pack_operation_exist': fields.function(_get_pack_operation_exist, type='boolean', string='Pack Operation Exists?', help='technical field for attrs in view'),
+#         'picking_type_id': fields.many2one('stock.picking.type', 'Picking Type', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, required=True),
+#         'picking_type_code': fields.related('picking_type_id', 'code', type='char', string='Picking Type Code', help="Technical field used to display the correct label on print button in the picking view"),
+# 
+#         'owner_id': fields.many2one('res.partner', 'Owner', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, help="Default Owner"),
+#         # Used to search on pickings
+#         'product_id': fields.related('move_lines', 'product_id', type='many2one', relation='product.product', string='Product'),
+#         'recompute_pack_op': fields.boolean('Recompute pack operation?', help='True if reserved quants changed, which mean we might need to recompute the package operations', copy=False),
+#         'location_id': fields.related('move_lines', 'location_id', type='many2one', relation='stock.location', string='Location', readonly=True),
+#         'location_dest_id': fields.related('move_lines', 'location_dest_id', type='many2one', relation='stock.location', string='Destination Location', readonly=True),
+#         'group_id': fields.related('move_lines', 'group_id', type='many2one', relation='procurement.group', string='Procurement Group', readonly=True,
+#               store={
+#                   'stock.picking': (lambda self, cr, uid, ids, ctx: ids, ['move_lines'], 10),
+#                   'stock.move': (_get_pickings, ['group_id', 'picking_id'], 10),
+#               }),
+#     }
+# 
+#     _defaults = {
+#         'name': '/',
+#         'state': 'draft',
+#         'move_type': 'direct',
+#         'priority': '1',  # normal
+#         'date': fields.datetime.now,
+#         'company_id': lambda self, cr, uid, c: self.pool.get('res.company')._company_default_get(cr, uid, 'stock.picking', context=c),
+#         'recompute_pack_op': True,
+#     }
+#     _sql_constraints = [
+#         ('name_uniq', 'unique(name, company_id)', 'Reference must be unique per company!'),
+#     ]
     
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
