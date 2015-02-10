@@ -9,8 +9,11 @@
             <field name="arch" type="xml">
                 <notebook position="inside">
                     <page string="Sessions">
-                        <group>
+                        <group>                        	
+                        	<field name="soldtopt"/>
+                        	<field name="shiptopt"/>
                             <field name="instructor"/>
+                            
    <!--                          <field name="session_ids"/> -->
                         </group>
                     </page>
