@@ -470,19 +470,50 @@
                         <field name="state" widget="statusbar"/>
                     </header>                    
                     <sheet>
+	                    <!-- <div class="oe_right oe_button_box" name="buttons">
+	                        <button class="oe_inline oe_stat_button" type="action"
+	                            context="{'default_opportunity_id': active_id, 'search_default_opportunity_id': active_id, 'default_partner_id': partner_id, 'default_duration': 1.0}"
+	                            name="%(crm.crm_case_categ_phone_incoming0)d" icon="fa-phone">
+	                            <div>Schedule/Log<br/>Calls</div>
+	                        </button>
+	                    </div> -->
+	                    <div class="oe_title">
+	                        <label for="dn" class="oe_edit_only"/>
+	                        <h1><field name="dn" placeholder="Apple Delivery#..."/></h1>
+	                    </div>
                         <group>
                             <group string="General">
-                                <field name="dn"/>
-                                <field name="partner_id"/>
-
+                                <field name="partner_id" string="Customer"
+                                	options='{"create_name_field": "name"}'/>
+                                <field name="cnee_name"/>                                
+								<field name="sales_doc"/>
+								<field name="pono"/>								
+								<field name="product_id"/>
+								<field name="hawb"/>
+								<field name="trackno"/>
                             </group>
                             <group string="Schedule">
                                 <field name="pickupdate"/>
                                 <field name="qty"/>
                                 <field name="eta"/>
-	                            <field name="product_id"/>
+                                <field name="eta"/>
+                                <field name="eta"/>
+                                <field name="eta"/>
+                                <field name="plt_qty"/>            
 
                             </group>
+                            
+                            <notebook colspan="4">
+			                    <page string="Internal Notes">
+			                        <field name="description"/>
+			                    </page>
+			                    
+			                    <page string="EDI Info">
+			                        <group>
+			                            
+			                        </group>
+			                    </page>
+		                    </notebook>
 
                         </group>
                     </sheet>

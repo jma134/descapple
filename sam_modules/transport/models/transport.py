@@ -313,7 +313,7 @@ class transport_order(models.Model):
         ('cancel', 'Cancelled'),
     ]
         
-    dn = fields.Integer('Delivery No.', select=True, required=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
+    dn = fields.Char('Delivery No.', size=10, select=True, required=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
     product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('type', '<>', 'service')], states={'done': [('readonly', True)]})
     cnee_name = fields.Char('Name1', size=128)
     sales_doc = fields.Char('Sales Doc', size=10)
@@ -323,9 +323,11 @@ class transport_order(models.Model):
     partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
     qty = fields.Integer('Dlvy Qty')
     plt_qty = fields.Integer('Plt Qty')
-    hawb = fields.Char('HAWB', size=23, select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
+    hawb = fields.Char('HAWB', size=23, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
+    trackno = fields.Char('Tracking No.', size=23, select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
     pickupdate = fields.Datetime('Pickup Date', help="Pickup Date, usually the time DESC pickup @ SLC", select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
-    eta = fields.Date('ETA', compute='_eta')          
+    eta = fields.Date('ETA', compute='_eta')  
+    description = fields.Text('Notes')
     state = fields.Selection(STATE_SELECTION, 'Status', readonly=True,
                                   help="The status of the transport order. "
                                        "A request for quotation is a purchase order in a 'Draft' status. "
@@ -341,7 +343,10 @@ class transport_order(models.Model):
     @api.one
     def _eta(self):
         self.eta = fields.datetime.now()
-                 
+    
+    @api.one
+    def action_confirm(self):
+        self.state = 'confirmed'
     
 #     partner_id = fields.Many2one('res.partner', 'Partner', ondelete='set null', track_visibility='onchange',
 #             select=True, help="Linked partner (optional). Usually created when converting the lead.")
