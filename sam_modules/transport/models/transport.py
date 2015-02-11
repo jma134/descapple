@@ -299,30 +299,32 @@ class transport_order(models.Model):
     _name = "transport.order"
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     _description = "Transport Order"
-    _order = 'eta desc, id desc'
+    _order = 'id desc'
     
     STATE_SELECTION = [
         ('draft', 'Draft'),
         ('sent', 'PreAlert'),
-        ('confirmed', 'Confirmed'),
+#         ('confirmed', 'Confirmed'),
 #         ('approved', 'Purchase Confirmed'),
         ('picking', 'Shipping'),
         ('pod', 'POD'),
+        ('invoiced', 'Invoiced'),
         ('done', 'Done'),
-        ('cancel', 'Cancelled')
+        ('cancel', 'Cancelled'),
     ]
         
-    dn = fields.Integer('Delivery No.', select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
+    dn = fields.Integer('Delivery No.', select=True, required=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
+    product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('type', '<>', 'service')], states={'done': [('readonly', True)]})
     cnee_name = fields.Char('Name1', size=128)
     sales_doc = fields.Char('Sales Doc', size=10)
-    pono = fields.Char('Purchase Order#', size=32)
+    pono = fields.Char('Purchase Order#', size=32)       
+    partner_id = fields.Many2one('res.partner', 'Customer', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
+                                 domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "Teacher")])    
     partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
-    material = fields.Char('Material', size=32)
-    materialdesc = fields.Char('Material Desc#', size=32)
     qty = fields.Integer('Dlvy Qty')
     plt_qty = fields.Integer('Plt Qty')
-    hawb = fields.Char('HAWB', size=23 select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
-    pickupdate = fields.Datetime('Pickup Date', help="Pickup Date, usually the time DESC pickup @ SLC", select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}),
+    hawb = fields.Char('HAWB', size=23, select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
+    pickupdate = fields.Datetime('Pickup Date', help="Pickup Date, usually the time DESC pickup @ SLC", select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
     eta = fields.Date('ETA', compute='_eta')          
     state = fields.Selection(STATE_SELECTION, 'Status', readonly=True,
                                   help="The status of the transport order. "
@@ -334,9 +336,12 @@ class transport_order(models.Model):
                                        "the invoice or in the receipt of goods, the status becomes "
                                        "in exception.",
                                   select=True, copy=False)
-    
-    
-    
+     
+     
+    @api.one
+    def _eta(self):
+        self.eta = fields.datetime.now()
+                 
     
 #     partner_id = fields.Many2one('res.partner', 'Partner', ondelete='set null', track_visibility='onchange',
 #             select=True, help="Linked partner (optional). Usually created when converting the lead.")

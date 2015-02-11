@@ -6,6 +6,11 @@
 		
 		<menuitem id="menu_transport_configuration" name="Configuration" parent="menu_transport_root" sequence="15"/>
 		<menuitem action="product.product_template_action" id="menu_transport_products_menu" parent="menu_transport_configuration" sequence="1"/>
+		
+		<menuitem id="menu_transport_resources_config" name="Resources" parent="menu_transport_configuration"/>        
+        <menuitem action="resource.action_resource_calendar_form" id="menu_view_resource_calendar_search_transport" parent="menu_transport_resources_config" sequence="1" groups="base.group_no_one"/>
+        <menuitem action="resource.action_resource_calendar_leave_tree" id="menu_view_resource_calendar_leaves_search_transport" parent="menu_transport_resources_config" sequence="1" groups="base.group_no_one"/>
+		
 
 <!--
     Transport EDI
@@ -104,7 +109,7 @@
             </field>
         </record>
                                 
-    	<menuitem action="action_transport_edi_tree" id="menu_action_transport_edi_tree" parent="menu_transport_edi" sequence="1"/>
+    	<menuitem action="action_transport_edi_tree" id="menu_action_transport_edi_tree" parent="menu_transport_edi" sequence="3"/>
         
 
 <!--
@@ -216,7 +221,6 @@
 
                             <label for="attendee_ids"/>
                         	<field name="attendee_ids"/>
-
                         </group>
                     </sheet>
                 </form>
@@ -403,7 +407,7 @@
             </field>
         </record>
 
-		<menuitem action="action_transport_sld_tree" id="menu_action_transport_sld_tree" parent="menu_transport_edi" sequence="1"/>
+		<menuitem action="action_transport_sld_tree" id="menu_action_transport_sld_tree" parent="menu_transport_edi" sequence="2"/>
 
 
                 
@@ -435,9 +439,72 @@
                     target="new"
                     key2="client_action_multi"/>
                     
-		<menuitem id="menu_transport_resources_config" name="Resources" parent="menu_transport_configuration"/>        
-        <menuitem action="resource.action_resource_calendar_form" id="menu_view_resource_calendar_search_transport" parent="menu_transport_resources_config" sequence="1" groups="base.group_no_one"/>
-        <menuitem action="resource.action_resource_calendar_leave_tree" id="menu_view_resource_calendar_leaves_search_transport" parent="menu_transport_resources_config" sequence="1" groups="base.group_no_one"/>
+		
+<!--
+    Transport Order
+-->
+		<record id="view_transport_order_tree" model="ir.ui.view">
+            <field name="name">transport.order.tree</field>
+            <field name="model">transport.order</field>
+            <field name="arch" type="xml">
+            <tree string="transport order list">
+                <field name="dn"/>
+                <field name="partner_id"/>
+                <field name="pickupdate"/>
+                <field name="qty"/>
+                <field name="eta"/>
+                <field name="product_id"/>                               
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>    
+                
+		<record id="view_transport_order_form" model="ir.ui.view">
+            <field name="name">transport.order.form</field>
+            <field name="model">transport.order</field>	
+            <field name="arch" type="xml">
+                <form string="Transport Order Form">
+                	<header>
+                        <button string="Confirm" type="object" name="action_confirm"
+                			states="draft" class="oe_highlight" />
+                        <field name="state" widget="statusbar"/>
+                    </header>                    
+                    <sheet>
+                        <group>
+                            <group string="General">
+                                <field name="dn"/>
+                                <field name="partner_id"/>
+
+                            </group>
+                            <group string="Schedule">
+                                <field name="pickupdate"/>
+                                <field name="qty"/>
+                                <field name="eta"/>
+	                            <field name="product_id"/>
+
+                            </group>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_transport_order_tree">
+            <field name="name">Order</field>
+            <field name="res_model">transport.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first Transport Order
+                </p>
+            </field>
+        </record>
+
+		<menuitem action="action_transport_order_tree" id="menu_action_transport_order_tree" parent="menu_transport_edi" sequence="1"/>
+		
+		
+		
                                        
     </data>
 </openerp>
