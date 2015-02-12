@@ -495,11 +495,18 @@
                                 <field name="pickupdate"/>
                                 <field name="qty"/>
                                 <field name="shpr_id"/>
-                                <field name="shpr_pt"/>
-                                <field name="eta"/>                                
+                                <field name="shpr_pt"/>                                                                                          
                                 <field name="plt_qty"/>
-                                <field name="remark"/>
-
+                                                                
+                                <label for="street" string="ETA"/>
+                                <div>
+	                                <field name="eta"/>                               
+	                                <div>                                    
+	                                    <field name="org" placeholder="City" style="width: 50%%"/>                                    
+	                                    <field name="dst" style="width: 50%%"/>
+	                                </div>									
+								</div>
+								<field name="remark"/>
                             </group>
                             
                             <notebook colspan="4">

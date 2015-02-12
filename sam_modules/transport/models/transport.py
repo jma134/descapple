@@ -323,10 +323,10 @@ class transport_order(models.Model):
                                  domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "Teacher")])    
     shpr_pt = fields.Char('ShPt', size=4)
     shpr_id = fields.Many2one('res.partner', 'Shipper', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
-                                 domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "Teacher")])
+                                 domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "OEM")])
     partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
-#     org
-#     dst
+    org = fields.Char("Orig", compute='_org_get')
+    dst = fields.Char("Dest", compute='_dst_get')
 #     tt
     qty = fields.Integer('Dlvy Qty')
     plt_qty = fields.Integer('Plt Qty')
@@ -356,7 +356,32 @@ class transport_order(models.Model):
     @api.one
     def confirm_order(self):
         self.state = 'confirmed'
+        
+    @api.one
+    @api.depends('shpr_id')
+    def _org_get(self):
+        if not (self.shpr_id):            
+            return
+        
+        self.org = self.shpr_id.city
     
+    @api.one
+    @api.depends('cnee_id')
+    def _dst_get(self):
+        if not (self.cnee_id):            
+            return
+        
+        self.dst = self.cnee_id.city
+        
+                
+#         ids = self.search(cr, uid,[ '|', ('partner_id', '!=', 34),'!', ('name', 'ilike', 'spam'),],order='partner_id' )
+#         if context is None:
+#             context = {}
+#         context_with_inactive = context.copy()
+#         context_with_inactive['active_test'] = False
+#         return self.search(cr, uid, [('id', 'child_of', ids)], context=context_with_inactive)
+#         self.search([('is_company', '=', True)], limit=1).name
+        
 #     partner_id = fields.Many2one('res.partner', 'Partner', ondelete='set null', track_visibility='onchange',
 #             select=True, help="Linked partner (optional). Usually created when converting the lead.")
 #     contact_name = fields.Char('Contact Name', size=64)
