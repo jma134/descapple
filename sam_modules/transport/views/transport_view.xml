@@ -449,7 +449,7 @@
             <field name="arch" type="xml">
             <tree string="transport order list">
                 <field name="dn"/>
-                <field name="partner_id"/>
+                <field name="cnee_id"/>
                 <field name="pickupdate"/>
                 <field name="qty"/>
                 <field name="eta"/>
@@ -465,8 +465,7 @@
             <field name="arch" type="xml">
                 <form string="Transport Order Form">
                 	<header>
-                        <button string="Confirm" type="object" name="action_confirm"
-                			states="draft" class="oe_highlight" />
+                		<button name="confirm_order" states="draft" string="Confirm" type="object" class="oe_highlight"/>
                         <field name="state" widget="statusbar"/>
                     </header>                    
                     <sheet>
@@ -483,7 +482,7 @@
 	                    </div>
                         <group>
                             <group string="General">
-                                <field name="partner_id" string="Customer"
+                                <field name="cnee_id" string="Customer"
                                 	options='{"create_name_field": "name"}'/>
                                 <field name="cnee_name"/>                                
 								<field name="sales_doc"/>
@@ -495,11 +494,11 @@
                             <group string="Schedule">
                                 <field name="pickupdate"/>
                                 <field name="qty"/>
-                                <field name="eta"/>
-                                <field name="eta"/>
-                                <field name="eta"/>
-                                <field name="eta"/>
-                                <field name="plt_qty"/>            
+                                <field name="shpr_id"/>
+                                <field name="shpr_pt"/>
+                                <field name="eta"/>                                
+                                <field name="plt_qty"/>
+                                <field name="remark"/>
 
                             </group>
                             

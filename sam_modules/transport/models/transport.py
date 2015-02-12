@@ -8,6 +8,7 @@ import openerp.addons.decimal_precision as dp
 from openerp import tools
 import time
 import logging
+from win32con import DST_BITMAP
 _logger = logging.getLogger(__name__)
 
 from openerp import models, fields, api, exceptions
@@ -260,7 +261,7 @@ class transport_sld(models.Model):
 
     @api.multi
     def onchange_type(self, is_company):        
-        if is_test:
+        if self.is_test:
             domain = {'title': [('domain', '=', 'partner')]}
         else:
             domain = {'title': [('domain', '=', 'contact')]}
@@ -318,16 +319,24 @@ class transport_order(models.Model):
     cnee_name = fields.Char('Name1', size=128)
     sales_doc = fields.Char('Sales Doc', size=10)
     pono = fields.Char('Purchase Order#', size=32)       
-    partner_id = fields.Many2one('res.partner', 'Customer', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
+    cnee_id = fields.Many2one('res.partner', 'Consignee', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
                                  domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "Teacher")])    
+    shpr_pt = fields.Char('ShPt', size=4)
+    shpr_id = fields.Many2one('res.partner', 'Shipper', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
+                                 domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "Teacher")])
     partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
+#     org
+#     dst
+#     tt
     qty = fields.Integer('Dlvy Qty')
     plt_qty = fields.Integer('Plt Qty')
     hawb = fields.Char('HAWB', size=23, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
     trackno = fields.Char('Tracking No.', size=23, select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
     pickupdate = fields.Datetime('Pickup Date', help="Pickup Date, usually the time DESC pickup @ SLC", select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
-    eta = fields.Date('ETA', compute='_eta')  
+    eta = fields.Date('ETA', compute='_eta')
+    remark = fields.Char('Remark', size=64)  
     description = fields.Text('Notes')
+    
     state = fields.Selection(STATE_SELECTION, 'Status', readonly=True,
                                   help="The status of the transport order. "
                                        "A request for quotation is a purchase order in a 'Draft' status. "
@@ -345,7 +354,7 @@ class transport_order(models.Model):
         self.eta = fields.datetime.now()
     
     @api.one
-    def action_confirm(self):
+    def confirm_order(self):
         self.state = 'confirmed'
     
 #     partner_id = fields.Many2one('res.partner', 'Partner', ondelete='set null', track_visibility='onchange',
