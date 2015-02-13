@@ -8,11 +8,13 @@ import openerp.addons.decimal_precision as dp
 from openerp import tools
 import time
 import logging
-from win32con import DST_BITMAP
+#from win32con import DST_BITMAP
 _logger = logging.getLogger(__name__)
 
 from openerp import models, fields, api, exceptions
 from datetime import timedelta
+
+import random
 
 
 #----------------------------------------------------------
@@ -327,7 +329,7 @@ class transport_order(models.Model):
     partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
     org = fields.Char("Orig", compute='_org_get')
     dst = fields.Char("Dest", compute='_dst_get')
-#     tt
+    tt = fields.Float("Transit Time", compute='_tt_get', help="Transit Time in days")
     qty = fields.Integer('Dlvy Qty')
     plt_qty = fields.Integer('Plt Qty')
     hawb = fields.Char('HAWB', size=23, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
@@ -373,6 +375,15 @@ class transport_order(models.Model):
         
         self.dst = self.cnee_id.city
         
+
+    @api.one
+    @api.depends('org', 'dst')
+    def _tt_get(self):
+        if self.org and self.dst:            
+            self.tt = random.randint(1, 10)
+        else:
+            self.tt = 0                  
+          
                 
 #         ids = self.search(cr, uid,[ '|', ('partner_id', '!=', 34),'!', ('name', 'ilike', 'spam'),],order='partner_id' )
 #         if context is None:

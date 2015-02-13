@@ -497,9 +497,9 @@
                                 <field name="shpr_id"/>
                                 <field name="shpr_pt"/>                                                                                          
                                 <field name="plt_qty"/>
-                                                                
+                                <field name="tt"/>                           
                                 <label for="street" string="ETA"/>
-                                <div>
+                                <div>                                	
 	                                <field name="eta"/>                               
 	                                <div>                                    
 	                                    <field name="org" placeholder="City" style="width: 50%%"/>                                    
