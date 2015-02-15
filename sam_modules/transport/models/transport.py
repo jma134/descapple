@@ -340,14 +340,10 @@ class transport_order(models.Model):
     description = fields.Text('Notes')
     
     state = fields.Selection(STATE_SELECTION, 'Status', readonly=True,
-                                  help="The status of the transport order. "
-                                       "A request for quotation is a purchase order in a 'Draft' status. "
-                                       "Then the order has to be confirmed by the user, the status switch "
-                                       "to 'Confirmed'. Then the supplier must confirm the order to change "
-                                       "the status to 'Approved'. When the purchase order is paid and "
-                                       "received, the status becomes 'Done'. If a cancel action occurs in "
-                                       "the invoice or in the receipt of goods, the status becomes "
-                                       "in exception.",
+                                  help=' * The \'Draft\' status is set automatically when purchase order in draft status. \
+                                   \n* The \'Confirmed\' status is set automatically as confirm when purchase order in confirm status. \
+                                   \n* The \'Done\' status is set automatically when purchase order is set as done. \
+                                   \n* The \'Cancelled\' status is set automatically when user cancel purchase order.',
                                   select=True, copy=False)
      
      
@@ -384,6 +380,64 @@ class transport_order(models.Model):
         else:
             self.tt = 0                  
           
+
+#----------------------------------------------------------
+# Transport order_line
+#----------------------------------------------------------
+class transport_order_line(models.Model):
+    _table = 'transport_order_line'
+    _name = 'transport.order.line'
+    _description = 'Purchase Order Line'
+    
+    def _amount_line(self, cr, uid, ids, prop, arg, context=None):
+        res = {}
+#         cur_obj=self.pool.get('res.currency')
+#         tax_obj = self.pool.get('account.tax')
+        for line in self.browse(cr, uid, ids, context=context):
+#             taxes = tax_obj.compute_all(cr, uid, line.taxes_id, line.price_unit, line.product_qty, line.product_id, line.order_id.partner_id)
+#             cur = line.order_id.pricelist_id.currency_id
+#             res[line.id] = cur_obj.round(cr, uid, cur, taxes['total'])
+            res[line.id] = random.randint(11, 99)
+        return res
+    
+    def _get_uom_id(self, cr, uid, context=None):
+        try:
+            proxy = self.pool.get('ir.model.data')
+            result = proxy.get_object_reference(cr, uid, 'product', 'product_uom_unit')
+            return result[1]
+        except Exception, ex:
+            return False
+            
+    name = fields.Text('Description', required=True)
+    product_qty = fields.Float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'), required=True)
+#     'taxes_id': fields.many2many('account.tax', 'purchase_order_taxe', 'ord_id', 'tax_id', 'Taxes')
+    product_uom = fields.Many2one('product.uom', 'Product Unit of Measure', required=True)
+    product_id = fields.Many2one('product.product', 'Product', domain=[('purchase_ok','=',True)], change_default=True)        
+    price_unit = fields.Float('Unit Price', required=True, digits_compute= dp.get_precision('Product Price'))
+    price_subtotal = fields.Float(compute='_amount_line', string='Subtotal', digits_compute= dp.get_precision('Account'))
+    order_id = fields.Many2one('transport.order', 'Order Reference', select=True, required=True, ondelete='cascade')        
+#         'company_id': fields.related('order_id','company_id',type='many2one',relation='res.company',string='Company', store=True, readonly=True),
+    state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed'), ('done', 'Done'), ('cancel', 'Cancelled')],
+                              'Status', required=True, readonly=True, copy=False,
+                              help=' * The \'Draft\' status is set automatically when purchase order in draft status. \
+                                   \n* The \'Confirmed\' status is set automatically as confirm when purchase order in confirm status. \
+                                   \n* The \'Done\' status is set automatically when purchase order is set as done. \
+                                   \n* The \'Cancelled\' status is set automatically when user cancel purchase order.')
+    
+#         'invoice_lines': fields.many2many('account.invoice.line', 'purchase_order_line_invoice_rel',
+#                                           'order_line_id', 'invoice_id', 'Invoice Lines',
+#                                           readonly=True, copy=False),
+#         'invoiced': fields.boolean('Invoiced', readonly=True, copy=False),
+
+#     partner_id = fields.Related('order_id', 'partner_id', string='Partner', readonly=True, type="many2one", relation="res.partner", store=True)
+#     date_order = fields.Related('order_id', 'date_order', string='Order Date', readonly=True, type="datetime")        
+    
+    
+#     http://odoo-new-api-guide-line.readthedocs.org/en/latest/fields.html
+
+
+
+
                 
 #         ids = self.search(cr, uid,[ '|', ('partner_id', '!=', 34),'!', ('name', 'ilike', 'spam'),],order='partner_id' )
 #         if context is None:
