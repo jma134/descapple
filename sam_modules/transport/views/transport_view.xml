@@ -469,16 +469,11 @@
                         <field name="state" widget="statusbar"/>
                     </header>                    
                     <sheet>
-	                    <!-- <div class="oe_right oe_button_box" name="buttons">
-	                        <button class="oe_inline oe_stat_button" type="action"
-	                            context="{'default_opportunity_id': active_id, 'search_default_opportunity_id': active_id, 'default_partner_id': partner_id, 'default_duration': 1.0}"
-	                            name="%(crm.crm_case_categ_phone_incoming0)d" icon="fa-phone">
-	                            <div>Schedule/Log<br/>Calls</div>
-	                        </button>
-	                    </div> -->
 	                    <div class="oe_title">
-	                        <label for="dn" class="oe_edit_only"/>
-	                        <h1><field name="dn" placeholder="Apple Delivery#..."/></h1>
+	                    	<h1>
+		                        <label for="dn" class="oe_edit_only"/>
+		                        <field name="dn" placeholder="Apple Delivery#..."/>
+	                        </h1>
 	                    </div>
                         <group>
                             <group string="General">
@@ -508,20 +503,43 @@
 								</div>
 								<field name="remark"/>
                             </group>
-                            
-                            <notebook colspan="4">
-			                    <page string="Internal Notes">
-			                        <field name="description"/>
-			                    </page>
-			                    
-			                    <page string="EDI Info">
-			                        <group>
-			                            
-			                        </group>
-			                    </page>
-		                    </notebook>
+						</group>                            
+                           <notebook>
+                           	<page string="Material">
+	                            <field name="order_line">
+	                                <tree string="Transport Order Lines" editable="bottom">
+	                                    <field name="product_id"/>
+	                                    <field name="name"/>                                   		                                    
+	                                    
+	                                    <field name="product_qty"/>
+	                                    <field name="product_uom"/>
+	                                    <field name="price_unit"/>
+	                                    <!-- <field name="taxes_id" widget="many2many_tags" domain="[('parent_id','=',False),('type_tax_use','!=','sale')]"/> -->
+	                                    <field name="price_subtotal"/>
+	                                    <field name="state" invisible="1"/>
+	                                </tree>
+	                            </field>
+	                         <!--    <group class="oe_subtotal_footer oe_right">
+	                                <field name="amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+	                                <field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+	                                <div class="oe_subtotal_footer_separator oe_inline">
+	                                    <label for="amount_total"/>
+	                                    <button name="button_dummy"
+	                                        states="draft" string="(update)" type="object" class="oe_edit_only oe_link"/>
+	                                </div>
+	                                <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+	                            </group> -->
+	                            <div class="oe_clear"/>
+	                            <field name="description" class="oe_inline" placeholder="Description..."/>
+	                        </page>
 
-                        </group>
+		                    
+		                    <page string="EDI Info">
+		                        <group>
+		                            
+		                        </group>
+		                    </page>
+	                    </notebook>                        
                     </sheet>
                 </form>
             </field>
