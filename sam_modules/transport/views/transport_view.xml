@@ -453,7 +453,7 @@
                 <field name="pickupdate"/>
                 <field name="qty"/>
                 <field name="eta"/>
-                <field name="product_id"/>                               
+                <!-- <field name="product_id"/> -->                               
                 <field name="state"/>
             </tree>
             </field>
@@ -471,7 +471,7 @@
                     <sheet>
 	                    <div class="oe_title">
 	                    	<h1>
-		                        <label for="dn" class="oe_edit_only"/>
+		                        <!-- <label for="dn" class="oe_edit_only"/> -->
 		                        <field name="dn" placeholder="Apple Delivery#..."/>
 	                        </h1>
 	                    </div>
@@ -482,12 +482,12 @@
                                 <field name="cnee_name"/>                                
 								<field name="sales_doc"/>
 								<field name="pono"/>								
-								<field name="product_id"/>
+								<!-- <field name="product_id"/> -->
 								<field name="hawb"/>
 								<field name="trackno"/>
+								<field name="pickupdate"/>
                             </group>
-                            <group string="Schedule">
-                                <field name="pickupdate"/>
+                            <group string="Schedule">                                
                                 <field name="qty"/>
                                 <field name="shpr_id"/>
                                 <field name="shpr_pt"/>                                                                                          
@@ -500,15 +500,15 @@
 	                                    <field name="org" placeholder="City" style="width: 50%%"/>                                    
 	                                    <field name="dst" style="width: 50%%"/>
 	                                </div>									
-								</div>
-								<field name="remark"/>
+								</div>								
                             </group>
 						</group>                            
                            <notebook>
                            	<page string="Material">
 	                            <field name="order_line">
 	                                <tree string="Transport Order Lines" editable="bottom">
-	                                    <field name="product_id"/>
+	                                    <field name="product_id" 
+	                                    	on_change="onchange_product_id(product_id,0,False,parent.partner_id, parent.date_order,parent.fiscal_position,date_planned,name,False,parent.state,context)"/>
 	                                    <field name="name"/>                                   		                                    
 	                                    
 	                                    <field name="product_qty"/>
@@ -537,6 +537,11 @@
 		                    <page string="EDI Info">
 		                        <group>
 		                            
+		                        </group>
+		                    </page>
+		                    <page string="Additional Info">
+		                        <group>
+		                            <field name="remark" class="oe_inline" placeholder="Remark..."/>
 		                        </group>
 		                    </page>
 	                    </notebook>                        
