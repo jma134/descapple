@@ -508,14 +508,14 @@
 	                            <field name="order_line">
 	                                <tree string="Transport Order Lines" editable="bottom">
 	                                    <field name="product_id" 
-	                                    	on_change="onchange_product_id(product_id,0,False,parent.partner_id, parent.date_order,parent.fiscal_position,date_planned,name,False,parent.state,context)"/>
+	                                    	on_change="onchange_product_id(product_id,0,False,parent.cnee_id,name,parent.state,context)"/>
 	                                    <field name="name"/>                                   		                                    
 	                                    
 	                                    <field name="product_qty"/>
 	                                    <field name="product_uom"/>
 	                                    <field name="price_unit"/>
 	                                    <!-- <field name="taxes_id" widget="many2many_tags" domain="[('parent_id','=',False),('type_tax_use','!=','sale')]"/> -->
-	                                    <field name="price_subtotal"/>
+	                                    <!-- <field name="price_subtotal"/> -->
 	                                    <field name="state" invisible="1"/>
 	                                </tree>
 	                            </field>

@@ -385,26 +385,69 @@ class transport_order(models.Model):
             self.tt = 0
             
     
-    #(parent.pricelist_id,product_id,0,False,parent.partner_id, parent.date_order,parent.fiscal_position,date_planned,name,False,parent.state,context)"
-    def onchange_product_id(self, cr, uid, ids, pricelist_id, product_id, qty, uom_id,
-            partner_id, date_order=False, fiscal_position_id=False, date_planned=False,
-            name=False, price_unit=False, state='draft', context=None):
+    
+          
+
+#----------------------------------------------------------
+# Transport order line
+#----------------------------------------------------------
+class transport_order_line(models.Model):
+    _table = 'transport_order_line'
+    _name = 'transport.order.line'
+    _description = 'Transport Order Line'
+    
+    def _amount_line(self, cr, uid, ids, prop, arg, context=None):
+        res = {}
+        cur_obj=self.pool.get('res.currency')
+        #tax_obj = self.pool.get('account.tax')
+        for line in self.browse(cr, uid, ids, context=context):
+            #taxes = tax_obj.compute_all(cr, uid, line.taxes_id, line.price_unit, line.product_qty, line.product_id, line.order_id.partner_id)
+            cur = line.order_id.pricelist_id.currency_id
+            res[line.id] = cur_obj.round(cr, uid, cur, taxes['total'])
+        return res
+
+
+    name = fields.Text('Description', required=True)
+    product_qty = fields.Float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'), required=True, default=lambda *a: 1.0)
+    #'date_planned': fields.date('Scheduled Date', required=True, select=True),
+    #'taxes_id': fields.many2many('account.tax', 'purchase_order_taxe', 'ord_id', 'tax_id', 'Taxes'),
+    product_uom = fields.Many2one('product.uom', 'Product Unit of Measure', required=True)
+    product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('type', '<>', 'service')], states={'done': [('readonly', True)]})
+    #'move_ids': fields.one2many('stock.move', 'purchase_line_id', 'Reservation', readonly=True, ondelete='set null'),
+    price_unit = fields.Float('Unit Price', required=True, digits_compute= dp.get_precision('Product Price'))
+    #price_subtotal = fields.Float(compute='_amount_line', string='Subtotal')
+    order_id = fields.Many2one('transport.order', 'Order Reference', select=True, required=True, ondelete='cascade')
+    #'account_analytic_id':fields.many2one('account.analytic.account', 'Analytic Account',),
+    #'company_id': fields.related('order_id','company_id',type='many2one',relation='res.company',string='Company', store=True, readonly=True),
+    state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed'), ('done', 'Done'), ('cancel', 'Cancelled')],
+                              'Status', required=True, readonly=True, copy=False, default=lambda *args: 'draft',
+                              help=' * The \'Draft\' status is set automatically when purchase order in draft status. \
+                                   \n* The \'Confirmed\' status is set automatically as confirm when purchase order in confirm status. \
+                                   \n* The \'Done\' status is set automatically when purchase order is set as done. \
+                                   \n* The \'Cancelled\' status is set automatically when user cancel purchase order.')
+                                                       
+
+
+#(parent.pricelist_id,product_id,0,False,parent.partner_id, parent.date_order,parent.fiscal_position,date_planned,name,False,parent.state,context)"
+    def onchange_product_id(self, cr, uid, ids, product_id, qty, uom_id,
+            partner_id, 
+            name=False, state='draft', context=None):
         """
         onchange handler of product_id.
         """
         if context is None:
             context = {}
 
-        res = {'value': {'price_unit': price_unit or 0.0, 'name': name or '', 'product_uom' : uom_id or False}}
+        res = {'value': {'name': name or '', 'product_uom' : uom_id or False}}
         if not product_id:
             return res
 
         product_product = self.pool.get('product.product')
         product_uom = self.pool.get('product.uom')
         res_partner = self.pool.get('res.partner')
-        product_pricelist = self.pool.get('product.pricelist')
-        account_fiscal_position = self.pool.get('account.fiscal.position')
-        account_tax = self.pool.get('account.tax')
+        #product_pricelist = self.pool.get('product.pricelist')
+        #account_fiscal_position = self.pool.get('account.fiscal.position')
+        #account_tax = self.pool.get('account.tax')
 
         # - check for the presence of partner_id and pricelist_id
         #if not partner_id:
@@ -439,88 +482,50 @@ class transport_order(models.Model):
 
         res['value'].update({'product_uom': uom_id})
 
-        # - determine product_qty and date_planned based on seller info
-        if not date_order:
-            date_order = fields.datetime.now()
+#         # - determine product_qty and date_planned based on seller info
+#         if not date_order:
+#             date_order = fields.datetime.now()
 
 
-        supplierinfo = False
-        precision = self.pool.get('decimal.precision').precision_get(cr, uid, 'Product Unit of Measure')
-        for supplier in product.seller_ids:
-            if partner_id and (supplier.name.id == partner_id):
-                supplierinfo = supplier
-                if supplierinfo.product_uom.id != uom_id:
-                    res['warning'] = {'title': _('Warning!'), 'message': _('The selected supplier only sells this product by %s') % supplierinfo.product_uom.name }
-                min_qty = product_uom._compute_qty(cr, uid, supplierinfo.product_uom.id, supplierinfo.min_qty, to_uom_id=uom_id)
-                if float_compare(min_qty , qty, precision_digits=precision) == 1: # If the supplier quantity is greater than entered from user, set minimal.
-                    if qty:
-                        res['warning'] = {'title': _('Warning!'), 'message': _('The selected supplier has a minimal quantity set to %s %s, you should not purchase less.') % (supplierinfo.min_qty, supplierinfo.product_uom.name)}
-                    qty = min_qty
-        dt = self._get_date_planned(cr, uid, supplierinfo, date_order, context=context).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+#         supplierinfo = False
+#         precision = self.pool.get('decimal.precision').precision_get(cr, uid, 'Product Unit of Measure')
+#         for supplier in product.seller_ids:
+#             if partner_id and (supplier.name.id == partner_id):
+#                 supplierinfo = supplier
+#                 if supplierinfo.product_uom.id != uom_id:
+#                     res['warning'] = {'title': _('Warning!'), 'message': _('The selected supplier only sells this product by %s') % supplierinfo.product_uom.name }
+#                 min_qty = product_uom._compute_qty(cr, uid, supplierinfo.product_uom.id, supplierinfo.min_qty, to_uom_id=uom_id)
+#                 if float_compare(min_qty , qty, precision_digits=precision) == 1: # If the supplier quantity is greater than entered from user, set minimal.
+#                     if qty:
+#                         res['warning'] = {'title': _('Warning!'), 'message': _('The selected supplier has a minimal quantity set to %s %s, you should not purchase less.') % (supplierinfo.min_qty, supplierinfo.product_uom.name)}
+#                     qty = min_qty
+#         dt = self._get_date_planned(cr, uid, supplierinfo, date_order, context=context).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         qty = qty or 1.0
-        res['value'].update({'date_planned': date_planned or dt})
+#         res['value'].update({'date_planned': date_planned or dt})
         if qty:
             res['value'].update({'product_qty': qty})
 
-        price = price_unit
-        if price_unit is False or price_unit is None:
-            # - determine price_unit and taxes_id
-            if pricelist_id:
-                date_order_str = datetime.strptime(date_order, DEFAULT_SERVER_DATETIME_FORMAT).strftime(DEFAULT_SERVER_DATE_FORMAT)
-                price = product_pricelist.price_get(cr, uid, [pricelist_id],
-                        product.id, qty or 1.0, partner_id or False, {'uom': uom_id, 'date': date_order_str})[pricelist_id]
-            else:
-                price = product.standard_price
-
-        taxes = account_tax.browse(cr, uid, map(lambda x: x.id, product.supplier_taxes_id))
-        fpos = fiscal_position_id and account_fiscal_position.browse(cr, uid, fiscal_position_id, context=context) or False
-        taxes_ids = account_fiscal_position.map_tax(cr, uid, fpos, taxes)
-        res['value'].update({'price_unit': price, 'taxes_id': taxes_ids})
+#         price = price_unit
+#         if price_unit is False or price_unit is None:
+#             # - determine price_unit and taxes_id
+#             if pricelist_id:
+#                 date_order_str = datetime.strptime(date_order, DEFAULT_SERVER_DATETIME_FORMAT).strftime(DEFAULT_SERVER_DATE_FORMAT)
+#                 price = product_pricelist.price_get(cr, uid, [pricelist_id],
+#                         product.id, qty or 1.0, partner_id or False, {'uom': uom_id, 'date': date_order_str})[pricelist_id]
+#             else:
+#                 price = product.standard_price
+# 
+#         taxes = account_tax.browse(cr, uid, map(lambda x: x.id, product.supplier_taxes_id))
+#         fpos = fiscal_position_id and account_fiscal_position.browse(cr, uid, fiscal_position_id, context=context) or False
+#         taxes_ids = account_fiscal_position.map_tax(cr, uid, fpos, taxes)
+#         res['value'].update({'price_unit': price, 'taxes_id': taxes_ids})
 
         return res                
-          
-
-#----------------------------------------------------------
-# Transport order line
-#----------------------------------------------------------
-class purchase_order_line(models.Model):
-    _table = 'transport_order_line'
-    _name = 'transport.order.line'
-    _description = 'Transport Order Line'
     
-    def _amount_line(self, cr, uid, ids, prop, arg, context=None):
-        res = {}
-        cur_obj=self.pool.get('res.currency')
-        tax_obj = self.pool.get('account.tax')
-        for line in self.browse(cr, uid, ids, context=context):
-            taxes = tax_obj.compute_all(cr, uid, line.taxes_id, line.price_unit, line.product_qty, line.product_id, line.order_id.partner_id)
-            cur = line.order_id.pricelist_id.currency_id
-            res[line.id] = cur_obj.round(cr, uid, cur, taxes['total'])
-        return res
-
-
-    name = fields.Text('Description', required=True)
-    product_qty = fields.Float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'), required=True)
-    #'date_planned': fields.date('Scheduled Date', required=True, select=True),
-    #'taxes_id': fields.many2many('account.tax', 'purchase_order_taxe', 'ord_id', 'tax_id', 'Taxes'),
-    product_uom = fields.Many2one('product.uom', 'Product Unit of Measure', required=True)
-    product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('type', '<>', 'service')], states={'done': [('readonly', True)]})
-    #'move_ids': fields.one2many('stock.move', 'purchase_line_id', 'Reservation', readonly=True, ondelete='set null'),
-    price_unit = fields.Float('Unit Price', required=True, digits_compute= dp.get_precision('Product Price'))
-    price_subtotal = fields.Float(compute='_amount_line', string='Subtotal')
-    order_id = fields.Many2one('purchase.order', 'Order Reference', select=True, required=True, ondelete='cascade')
-    #'account_analytic_id':fields.many2one('account.analytic.account', 'Analytic Account',),
-    #'company_id': fields.related('order_id','company_id',type='many2one',relation='res.company',string='Company', store=True, readonly=True),
-    state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed'), ('done', 'Done'), ('cancel', 'Cancelled')],
-                              'Status', required=True, readonly=True, copy=False,
-                              help=' * The \'Draft\' status is set automatically when purchase order in draft status. \
-                                   \n* The \'Confirmed\' status is set automatically as confirm when purchase order in confirm status. \
-                                   \n* The \'Done\' status is set automatically when purchase order is set as done. \
-                                   \n* The \'Cancelled\' status is set automatically when user cancel purchase order.')
-                                                       
-
-
+    
+    
 #     http://odoo-new-api-guide-line.readthedocs.org/en/latest/fields.html
+
 
                         
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
