@@ -519,17 +519,17 @@
 	                                    <field name="state" invisible="1"/>
 	                                </tree>
 	                            </field>
-	                         <!--    <group class="oe_subtotal_footer oe_right">
-	                                <field name="amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-	                                <field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+	                            <group class="oe_subtotal_footer oe_right">
+	                                <field name="qty" widget="monetary"/>	                                
 	                                <div class="oe_subtotal_footer_separator oe_inline">
-	                                    <label for="amount_total"/>
+	                                    <label for="hawb"/>
 	                                    <button name="button_dummy"
 	                                        states="draft" string="(update)" type="object" class="oe_edit_only oe_link"/>
 	                                </div>
-	                                <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-	                            </group> -->
+	                                <field name="qty" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+	                            </group>
 	                            <div class="oe_clear"/>
+	                            
 	                            <field name="description" class="oe_inline" placeholder="Description..."/>
 	                        </page>
 

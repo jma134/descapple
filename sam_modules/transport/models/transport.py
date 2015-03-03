@@ -315,9 +315,18 @@ class transport_order(models.Model):
         ('done', 'Done'),
         ('cancel', 'Cancelled'),
     ]
+    
+    @api.one
+    @api.depends('order_line')
+    def _qty_all(self):
+        val = 0 
+        for line in self.order_line:
+           val += line.product_qty
+        
+        self.qty = val
         
     dn = fields.Char('Delivery No.', size=10, select=True, required=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
-    product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('type', '<>', 'service')], states={'done': [('readonly', True)]})
+    #product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('type', '<>', 'service')], states={'done': [('readonly', True)]})
     cnee_name = fields.Char('Name1', size=128)
     sales_doc = fields.Char('Sales Doc', size=10)
     pono = fields.Char('Purchase Order#', size=32)       
@@ -330,8 +339,8 @@ class transport_order(models.Model):
     org = fields.Char("Orig", compute='_org_get')
     dst = fields.Char("Dest", compute='_dst_get')
     tt = fields.Float("Transit Time", compute='_tt_get', help="Transit Time in days")
-    qty = fields.Integer('Dlvy Qty')
-    plt_qty = fields.Integer('Plt Qty')
+    qty = fields.Integer('Dlvy Qty', compute='_qty_all', help="The Total Quantity of this DN", multi="sums")    
+    plt_qty = fields.Integer('Plt Qty', default=1)
     order_line = fields.One2many('transport.order.line', 'order_id', 'Order Lines',
                                       states={'picking':[('readonly',True)],
                                               'done':[('readonly',True)]},
@@ -385,6 +394,8 @@ class transport_order(models.Model):
             self.tt = 0
             
     
+    def button_dummy(self, cr, uid, ids, context=None):
+        return True    
     
           
 
@@ -408,7 +419,8 @@ class transport_order_line(models.Model):
 
 
     name = fields.Text('Description', required=True)
-    product_qty = fields.Float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'), required=True, default=lambda *a: 1.0)
+    #product_qty = fields.Float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'), required=True, default=lambda *a: 1.0)
+    product_qty = fields.Integer('Quantity', required=True, default=lambda *a: 1.0)
     #'date_planned': fields.date('Scheduled Date', required=True, select=True),
     #'taxes_id': fields.many2many('account.tax', 'purchase_order_taxe', 'ord_id', 'tax_id', 'Taxes'),
     product_uom = fields.Many2one('product.uom', 'Product Unit of Measure', required=True)
