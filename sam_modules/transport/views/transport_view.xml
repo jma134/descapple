@@ -522,7 +522,7 @@
 	                            <group class="oe_subtotal_footer oe_right">
 	                                <field name="qty" widget="monetary"/>	                                
 	                                <div class="oe_subtotal_footer_separator oe_inline">
-	                                    <label for="hawb"/>
+	                                    <label for="qty"/>
 	                                    <button name="button_dummy"
 	                                        states="draft" string="(update)" type="object" class="oe_edit_only oe_link"/>
 	                                </div>

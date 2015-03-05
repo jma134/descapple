@@ -388,8 +388,17 @@ class transport_order(models.Model):
     @api.one
     @api.depends('org', 'dst')
     def _tt_get(self):
-        if self.org and self.dst:            
-            self.tt = random.randint(1, 10)
+        if self.org and self.dst:
+            sld_obj=self.pool.get('transport.sld')     
+            sld_ids = sld_obj.search(self._cr, self._uid, [('org', '=', self.org), ('dst', '=', self.dst)])
+            #print types
+            if sld_ids:
+                purchase_order_obj.browse(cr, uid, po_ids, context=context)
+                self.tt = random.randint(1, 10)
+                print ttime
+                print ttime[0]
+            else:
+                self.tt = 0
         else:
             self.tt = 0
             
