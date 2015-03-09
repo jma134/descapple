@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <menuitem name="Springback" id="menu_springback_root" sequence="110"/>
+		<menuitem id="menu_springback_main" name="Springback" parent="menu_springback_root" sequence="1"/>
+		
+<!--
+    springback Order
+-->
+		<record id="view_springback_order_tree" model="ir.ui.view">
+            <field name="name">springback.order.tree</field>
+            <field name="model">springback.order</field>
+            <field name="arch" type="xml">
+            <tree string="springback order list" colors="#0000ff:taken_plt&lt;1.0;red:taken_plt&gt;0.5">                
+                <field name="cnee_id"/>
+                <field name="product_id"/>
+                <field name="total_qty"/>
+                <field name="total_plt"/>
+                <field name="ho_date"/>
+                <field name="taken_plt" widget="progressbar"/>                    
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>
+        
+        <!-- calendar view -->
+        <record id="view_springback_order_calendar" model="ir.ui.view">
+            <field name="name">springback.order.calendar</field>
+            <field name="model">springback.order</field>
+            <field name="arch" type="xml">
+                <calendar string="Springback Calendar" date_start="ho_date"
+                          date_stop="end_date"
+                          color="product_id">
+                    <field name="product_id"/>
+                    <field name="total_plt"/>
+                </calendar>
+            </field>
+        </record>
+        
+        <!-- graph view -->
+         <record id="view_springback_order_graph" model="ir.ui.view">
+            <field name="name">springback.order.graph</field>
+            <field name="model">springback.order</field>
+            <field name="arch" type="xml">
+                <graph string="Pallet by OEM">
+                    <field name="cnee_id"/>
+                    <field name="total_plt" type="measure"/>
+                </graph>
+            </field>
+        </record>        
+            
+                
+		<record id="view_springback_order_form" model="ir.ui.view">
+            <field name="name">springback.order.form</field>
+            <field name="model">springback.order</field>	
+            <field name="arch" type="xml">
+                <form string="springback Order Form">
+                	<header>
+                		<button name="confirm_order" states="draft" string="Confirm" type="object" class="oe_highlight"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>                    
+                    <sheet>	                    
+                        <group>
+                            <group string="General">
+                                <field name="cnee_id"/>
+                                <field name="ho_date"/>
+                                <field name="slc_date"/>
+                                <field name="end_date"/>                             
+                            </group>
+                            <group string="Schedule">                                
+                                <field name="product_id"/>
+                                <field name="total_qty"/>                                                                                                                          
+                                <field name="total_plt"/>
+                                <field name="taken_plt" widget="progressbar"/>                                                     							
+                            </group>
+						</group>                            
+                           <notebook>
+                           	<page string="Material">
+	                            <field name="order_line">
+	                                <tree string="springback Order Lines" editable="bottom">
+	                                    <field name="date_shipped"/>                                                                 		                                    
+	                                    <field name="product_qty"/>
+	                                    <field name="product_plt"/>
+	                                    <field name="state" invisible="1"/>
+	                                </tree>
+	                            </field>
+	                            <group class="oe_subtotal_footer oe_right">
+	                                <!-- <field name="qty" widget="monetary"/>
+	                                <field name="plt" widget="monetary"/>  -->                              
+	                                <div class="oe_subtotal_footer_separator oe_inline">
+	                                    <label for="qty"/>
+	                                </div>
+	                                <field name="qty" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+	                                <div class="oe_subtotal_footer_separator oe_inline">
+	                                    <label for="plt"/>
+	                                </div>
+	                                <field name="plt" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+	                            </group>
+	                            <div class="oe_clear"/>
+	                            
+	                            <field name="description" class="oe_inline" placeholder="Handling Security..."/>	                            
+	                        </page>
+	                        <page string="Remark">
+	                        	<field name="remark"/>
+	                        </page>          
+	                    </notebook>                        
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_springback_order_tree">
+            <field name="name">Order</field>
+            <field name="res_model">springback.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,calendar,graph</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first springback Order
+                </p>
+            </field>
+        </record>
+
+		<menuitem action="action_springback_order_tree" id="menu_action_springback_order_tree" parent="menu_springback_main" sequence="1"/>
+		
+		
+		
+                                       
+    </data>
+</openerp>
