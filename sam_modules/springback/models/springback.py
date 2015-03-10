@@ -69,9 +69,9 @@ class springback_order(models.Model):
                                       states={'picking':[('readonly',True)],
                                               'done':[('readonly',True)]},
                                       copy=True)    
-    ho_date = fields.Date('OEM H/O', default=fields.datetime.now())
-    end_date = fields.Date('Ending Date')
-    slc_date = fields.Date('SLC Date')
+    oem_date = fields.Date('OEM H/O', default=fields.datetime.now())    
+    slc_date = fields.Date('SLC H/O')
+    dc_date = fields.Date('DC H/O')
     eta = fields.Date('Ending Date', compute='_eta')
     
     description = fields.Text('Handling Security')
@@ -103,6 +103,12 @@ class springback_order(models.Model):
             self.taken_plt = 0.0
         else:
             self.taken_plt = 100.0 * self.plt / self.total_plt
+            
+    @api.one
+    @api.constrains('slc_date', 'oem_date')
+    def _check_value(self):
+        if self.slc_date < self.oem_date:
+            raise exceptions.ValidationError("SCL H/O date should be larger than OEM H/O date!")
 
 
 #----------------------------------------------------------

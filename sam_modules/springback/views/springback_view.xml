@@ -16,7 +16,7 @@
                 <field name="product_id"/>
                 <field name="total_qty"/>
                 <field name="total_plt"/>
-                <field name="ho_date"/>
+                <field name="oem_date"/>
                 <field name="taken_plt" widget="progressbar"/>                    
                 <field name="state"/>
             </tree>
@@ -28,8 +28,7 @@
             <field name="name">springback.order.calendar</field>
             <field name="model">springback.order</field>
             <field name="arch" type="xml">
-                <calendar string="Springback Calendar" date_start="ho_date"
-                          date_stop="end_date"
+                <calendar string="Springback Calendar" date_start="oem_date" date_stop="dc_date"
                           color="product_id">
                     <field name="product_id"/>
                     <field name="total_plt"/>
@@ -63,9 +62,9 @@
                         <group>
                             <group string="General">
                                 <field name="cnee_id"/>
-                                <field name="ho_date"/>
+                                <field name="oem_date"/>
                                 <field name="slc_date"/>
-                                <field name="end_date"/>                             
+                                <field name="dc_date"/>                             
                             </group>
                             <group string="Schedule">                                
                                 <field name="product_id"/>
