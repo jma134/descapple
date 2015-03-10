@@ -62,9 +62,12 @@
                         <group>
                             <group string="General">
                                 <field name="cnee_id"/>
-                                <field name="oem_date"/>
+	                            <field name="oem_date"/>    									
+                              	<field name="oem_date_actual"/>
                                 <field name="slc_date"/>
-                                <field name="dc_date"/>                             
+                                <field name="slc_date_actual"/>
+                                <field name="dc_date"/>
+                                <field name="dc_date_actual"/>                            
                             </group>
                             <group string="Schedule">                                
                                 <field name="product_id"/>

@@ -37,6 +37,7 @@
 #         'security/ir.model.access.csv',
         #'wizard/vmi_location_product_view.xml',
         'views/springback_view.xml',
+        'views/product_view.xml',
 #         'views/session_workflow.xml',
     ],
     'installable': True,

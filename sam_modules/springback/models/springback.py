@@ -69,9 +69,12 @@ class springback_order(models.Model):
                                       states={'picking':[('readonly',True)],
                                               'done':[('readonly',True)]},
                                       copy=True)    
-    oem_date = fields.Date('OEM H/O', default=fields.datetime.now())    
-    slc_date = fields.Date('SLC H/O')
-    dc_date = fields.Date('DC H/O')
+    oem_date = fields.Date('OEM H/O Planned', default=fields.datetime.now())
+    oem_date_actual = fields.Date('OEM H/O Actual', default=fields.datetime.now()) 
+    slc_date = fields.Date('SLC H/O Planned')
+    slc_date_actual = fields.Date('SLC H/O Actual')
+    dc_date = fields.Date('DC H/O Planned')
+    dc_date_actual = fields.Date('DC H/O Acutal')
     eta = fields.Date('Ending Date', compute='_eta')
     
     description = fields.Text('Handling Security')
