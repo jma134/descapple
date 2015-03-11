@@ -28,7 +28,7 @@ class springback_order(models.Model):
     
     STATE_SELECTION = [
         ('draft', 'Draft'),
-        ('picking', 'Picking'),
+        ('shipping', 'Shipping'),
         ('done', 'Done'),
         ('cancel', 'Cancelled'),
     ]
@@ -60,13 +60,13 @@ class springback_order(models.Model):
 #     org = fields.Char("Orig", compute='_org_get')
 #     dst = fields.Char("Dest", compute='_dst_get')
 #     tt = fields.Float("Transit Time", compute='_tt_get', help="Transit Time in days")
-    total_qty_plan = fields.Integer('Planned Total Volume', required=True)
-    total_qty = fields.Integer('Total Volume', required=True)
+    total_qty_plan = fields.Integer('Planned Volume', required=True)
+    total_qty = fields.Integer('Volume', required=True)
     volperplt = fields.Integer("Volume per Pallet", compute='_volperplt_get')
     qty = fields.Integer('Volume Subtotal', compute='_qty_all', help="The shipped Quantity of this order", multi="sums")    
-    total_plt = fields.Integer('Total Pallet', compute='_calc_plt')
+    total_plt = fields.Integer('Pallet', compute='_calc_plt')
     plt = fields.Integer('Pallet Subtotal', compute='_qty_all', help="The shipped Pallet of this order", multi="sums")
-    taken_qty = fields.Float(string="Taken Pallets", compute='_taken_plt')
+    taken_qty = fields.Float(string="Taken Volume", compute='_taken_qty')
     order_line = fields.One2many('springback.order.line', 'order_id', 'Order Lines',
                                       states={'picking':[('readonly',True)],
                                               'done':[('readonly',True)]},
@@ -89,7 +89,24 @@ class springback_order(models.Model):
                                    \n* The \'Cancelled\' status is set automatically when user cancel purchase order.',
                                   select=True, copy=False)
      
-     
+    
+    @api.one
+    def action_draft(self):
+        self.state = 'draft'
+        
+    @api.one
+    def action_shipping(self):
+        self.state = 'shipping'
+        
+    @api.one
+    def action_done(self):
+        self.state = 'done'
+
+    @api.one
+    def action_cancel(self):
+        self.state = 'cancel'
+        
+                 
     @api.one
     @api.depends('order_line')
     def _eta(self):
@@ -103,17 +120,22 @@ class springback_order(models.Model):
                
     @api.one
     @api.depends('total_qty', 'qty')
-    def _taken_plt(self):
+    def _taken_qty(self):
         if not self.total_qty:
             self.taken_qty = 0.0
         else:
             self.taken_qty = 100.0 * self.qty / self.total_qty
             
     @api.one
-    @api.constrains('slc_date', 'oem_date')
+    @api.constrains('slc_date', 'oem_date', 'dc_date')
     def _check_value(self):
-        if self.slc_date < self.oem_date:
-            raise exceptions.ValidationError("SCL H/O date should be larger than OEM H/O date!")
+        if self.slc_date and self.oem_date:
+            if self.slc_date < self.oem_date:
+                raise exceptions.ValidationError("SLC H/O date should be larger than OEM H/O date!")            
+        if self.slc_date and self.dc_date:
+            if self.dc_date < self.slc_date:
+                raise exceptions.ValidationError("DC H/O date should be larger than SLC H/O date!")
+            
         
     @api.one
     @api.depends('product_id')

@@ -38,7 +38,7 @@
         #'wizard/vmi_location_product_view.xml',
         'views/springback_view.xml',
         'views/product_view.xml',
-#         'views/session_workflow.xml',
+        'views/springback_workflow.xml',
     ],
     'installable': True,
 #    'application': True,

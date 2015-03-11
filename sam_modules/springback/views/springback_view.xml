@@ -55,9 +55,13 @@
             <field name="arch" type="xml">
                 <form string="springback Order Form">
                 	<header>
-                		<button name="confirm_order" states="draft" string="Confirm" type="object" class="oe_highlight"/>
+                        <button name="draft" type="workflow" string="Reset to draft" states="shipping,done"/>
+                        <button name="shipping" type="workflow" string="Shipping" states="draft" class="oe_highlight"/>
+                        <button name="done" type="workflow" string="Mark as done" states="shipping" class="oe_highlight"/>
+                        <button name="cancel" type="workflow" string="Cancel" states="draft,shipping"/>
+                        
                         <field name="state" widget="statusbar"/>
-                    </header>                    
+                    </header>                        
                     <sheet>	                    
                         <group>
                             <group string="General">
@@ -79,7 +83,7 @@
                             </group>
 						</group>                            
                            <notebook>
-                           	<page string="Material">
+                           	<page string="Shipment Info">
 	                            <field name="order_line">
 	                                <tree string="springback Order Lines" editable="bottom">
 	                                	<field name="category"/>
