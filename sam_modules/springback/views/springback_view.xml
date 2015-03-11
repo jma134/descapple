@@ -11,13 +11,13 @@
             <field name="name">springback.order.tree</field>
             <field name="model">springback.order</field>
             <field name="arch" type="xml">
-            <tree string="springback order list" colors="#0000ff:taken_plt&lt;1.0;red:taken_plt&gt;0.5">                
+            <tree string="springback order list" colors="#0000ff:taken_qty&lt;1.0;red:taken_qty&gt;0.5">                
                 <field name="cnee_id"/>
                 <field name="product_id"/>
                 <field name="total_qty"/>
                 <field name="total_plt"/>
                 <field name="oem_date"/>
-                <field name="taken_plt" widget="progressbar"/>                    
+                <field name="taken_qty" widget="progressbar"/>                    
                 <field name="state"/>
             </tree>
             </field>
@@ -71,18 +71,21 @@
                             </group>
                             <group string="Schedule">                                
                                 <field name="product_id"/>
+                                <field name="volperplt"/>
+                                <field name="total_qty_plan"/>
                                 <field name="total_qty"/>                                                                                                                          
                                 <field name="total_plt"/>
-                                <field name="taken_plt" widget="progressbar"/>                                                     							
+                                <field name="taken_qty" widget="progressbar"/>                                                     							
                             </group>
 						</group>                            
                            <notebook>
                            	<page string="Material">
 	                            <field name="order_line">
 	                                <tree string="springback Order Lines" editable="bottom">
-	                                    <field name="date_shipped"/>                                                                 		                                    
-	                                    <field name="product_qty"/>
-	                                    <field name="product_plt"/>
+	                                	<field name="category"/>
+	                                    <field name="date_shipped"/>
+	                                    <field name="dc_date"/>
+	                                    <field name="product_qty"/>	                                    
 	                                    <field name="state" invisible="1"/>
 	                                </tree>
 	                            </field>
@@ -93,10 +96,10 @@
 	                                    <label for="qty"/>
 	                                </div>
 	                                <field name="qty" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
-	                                <div class="oe_subtotal_footer_separator oe_inline">
+	                                <!-- <div class="oe_subtotal_footer_separator oe_inline">
 	                                    <label for="plt"/>
 	                                </div>
-	                                <field name="plt" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+	                                <field name="plt" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/> -->
 	                            </group>
 	                            <div class="oe_clear"/>
 	                            
@@ -125,6 +128,15 @@
 		<menuitem action="action_springback_order_tree" id="menu_action_springback_order_tree" parent="menu_springback_main" sequence="1"/>
 		
 		
+		
+		<record model="ir.actions.act_window" id="action_springback_oem_tree">
+            <field name="name">OEM</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="menu_action_springback_oem_tree" name="OEM"
+                  parent="menu_springback_main"
+                  action="action_springback_oem_tree"/>
 		
                                        
     </data>

@@ -37,14 +37,14 @@ class springback_order(models.Model):
     @api.depends('order_line')
     def _qty_all(self):
         qty = 0
-        plt = 0
+        #plt = 0
         if self.order_line:       
             for line in self.order_line:
                qty += line.product_qty
-               plt += line.product_plt
+               #plt += line.product_plt
             
         self.qty = qty
-        self.plt = plt
+        #self.plt = plt
         
     
     product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('type', '<>', 'service')], states={'done': [('readonly', True)]})
@@ -60,11 +60,13 @@ class springback_order(models.Model):
 #     org = fields.Char("Orig", compute='_org_get')
 #     dst = fields.Char("Dest", compute='_dst_get')
 #     tt = fields.Float("Transit Time", compute='_tt_get', help="Transit Time in days")
+    total_qty_plan = fields.Integer('Planned Total Volume', required=True)
     total_qty = fields.Integer('Total Volume', required=True)
+    volperplt = fields.Integer("Volume per Pallet", compute='_volperplt_get')
     qty = fields.Integer('Volume Subtotal', compute='_qty_all', help="The shipped Quantity of this order", multi="sums")    
-    total_plt = fields.Integer('Total Pallet', required=True)
+    total_plt = fields.Integer('Total Pallet', compute='_calc_plt')
     plt = fields.Integer('Pallet Subtotal', compute='_qty_all', help="The shipped Pallet of this order", multi="sums")
-    taken_plt = fields.Float(string="Taken Pallets", compute='_taken_plt')
+    taken_qty = fields.Float(string="Taken Pallets", compute='_taken_plt')
     order_line = fields.One2many('springback.order.line', 'order_id', 'Order Lines',
                                       states={'picking':[('readonly',True)],
                                               'done':[('readonly',True)]},
@@ -100,19 +102,35 @@ class springback_order(models.Model):
         self.state = 'confirmed'
                
     @api.one
-    @api.depends('total_plt', 'plt')
+    @api.depends('total_qty', 'qty')
     def _taken_plt(self):
-        if not self.total_plt:
-            self.taken_plt = 0.0
+        if not self.total_qty:
+            self.taken_qty = 0.0
         else:
-            self.taken_plt = 100.0 * self.plt / self.total_plt
+            self.taken_qty = 100.0 * self.qty / self.total_qty
             
     @api.one
     @api.constrains('slc_date', 'oem_date')
     def _check_value(self):
         if self.slc_date < self.oem_date:
             raise exceptions.ValidationError("SCL H/O date should be larger than OEM H/O date!")
+        
+    @api.one
+    @api.depends('product_id')
+    def _volperplt_get(self):
+        if not (self.product_id):            
+            return
+        
+        self.volperplt = self.product_id.vol_per_plt
 
+    @api.one
+    @api.depends('total_qty', 'volperplt')
+    def _calc_plt(self):
+        if self.total_qty and self.volperplt:
+            self.total_plt = round(self.total_qty / self.volperplt)
+        else:
+            self.total_plt = ""
+            
 
 #----------------------------------------------------------
 # springback order line
@@ -122,10 +140,20 @@ class springback_order_line(models.Model):
     _name = 'springback.order.line'
     _description = 'springback Order Line'
     
-
+    category = fields.Selection([
+                        ('reseller', 'Reseller'),
+                        ('retail', 'Retail'),
+                        ('online', 'Online'),
+                        ('market1', 'Marketing Direct'),
+                        ('market2', 'Marketing Hub')],
+                'Customer Type', required=True,
+                help="""* this field representing the customer type                      
+                       \n* for products delivery
+                      """, select=True)
     product_qty = fields.Integer('Volume', required=True, default=lambda *a: 1.0)
-    product_plt = fields.Integer('Pallet', required=True, default=lambda *a: 1.0)    
+    #product_plt = fields.Integer('Pallet', required=True, default=lambda *a: 1.0)
     date_shipped = fields.Date('Shipped Date', required=True, select=True)
+    dc_date = fields.Date('Marketing DC Shipped Date')  
     order_id = fields.Many2one('springback.order', 'Order Reference', select=True, required=True, ondelete='cascade')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed'), ('done', 'Done'), ('cancel', 'Cancelled')],
                               'Status', required=True, readonly=True, copy=False, default=lambda *args: 'draft',

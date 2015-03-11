@@ -393,10 +393,10 @@ class transport_order(models.Model):
             sld_ids = sld_obj.search(self._cr, self._uid, [('org', '=', self.org), ('dst', '=', self.dst)])
             #print types
             if sld_ids:
-                purchase_order_obj.browse(cr, uid, po_ids, context=context)
-                self.tt = random.randint(1, 10)
-                print ttime
-                print ttime[0]
+                sld = sld_obj.browse(self._cr, self._uid, sld_ids, context=self._context)
+#                 self.tt = random.randint(1, 10)
+                self.tt = sld[0].tt
+                #print sld[0].tt                
             else:
                 self.tt = 0
         else:

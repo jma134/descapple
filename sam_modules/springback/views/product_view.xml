@@ -14,7 +14,7 @@
         </record>
 
         <record model="ir.actions.act_window" id="action_springback_product_tree">
-            <field name="name">Product</field>
+            <field name="name">Material</field>
             <field name="res_model">product.template</field>
             <field name="view_mode">tree,form</field>
         </record>
