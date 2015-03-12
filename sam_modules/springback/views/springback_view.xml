@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
-        <menuitem name="Springback" id="menu_springback_root" sequence="110"/>
-		<menuitem id="menu_springback_main" name="Springback" parent="menu_springback_root" sequence="1"/>
+        <menuitem name="NPI" id="menu_springback_root" sequence="110"/>
+		<menuitem id="menu_springback_main" name="NPI/Springback" parent="menu_springback_root" sequence="1"/>
 		
 <!--
     springback Order
@@ -14,9 +14,11 @@
             <tree string="springback order list" colors="#0000ff:taken_qty&lt;1.0;red:taken_qty&gt;0.5">                
                 <field name="cnee_id"/>
                 <field name="product_id"/>
+                <field name="customer"/>
                 <field name="total_qty"/>
                 <field name="total_plt"/>
                 <field name="oem_date"/>
+                <field name="slc_date"/>
                 <field name="taken_qty" widget="progressbar"/>                    
                 <field name="state"/>
             </tree>
@@ -28,10 +30,10 @@
             <field name="name">springback.order.calendar</field>
             <field name="model">springback.order</field>
             <field name="arch" type="xml">
-                <calendar string="Springback Calendar" date_start="oem_date" date_stop="dc_date"
+                <calendar string="Springback Calendar" date_start="oem_date_actual" date_stop="slc_date_actual"
                           color="product_id">
                     <field name="product_id"/>
-                    <field name="total_plt"/>
+                    <field name="total_qty"/>
                 </calendar>
             </field>
         </record>
@@ -41,9 +43,9 @@
             <field name="name">springback.order.graph</field>
             <field name="model">springback.order</field>
             <field name="arch" type="xml">
-                <graph string="Pallet by OEM">
+                <graph string="Volume by OEM">
                     <field name="cnee_id"/>
-                    <field name="total_plt" type="measure"/>
+                    <field name="total_qty" type="measure"/>
                 </graph>
             </field>
         </record>        
@@ -74,6 +76,7 @@
                                 <field name="dc_date_actual"/>                            
                             </group>
                             <group string="Schedule">                                
+                            	<field name="customer"/>
                                 <field name="product_id"/>
                                 <field name="volperplt"/>
                                 <field name="total_qty_plan"/>
@@ -85,11 +88,12 @@
                            <notebook>
                            	<page string="Shipment Info">
 	                            <field name="order_line">
-	                                <tree string="springback Order Lines" editable="bottom">
-	                                	<field name="category"/>
-	                                    <field name="date_shipped"/>
-	                                    <field name="dc_date"/>
-	                                    <field name="product_qty"/>	                                    
+	                                <tree string="springback Order Lines" editable="bottom">	                                	
+	                                    <field name="pickup_point"/>
+	                                    <field name="pickup_time"/>
+	                                    <field name="delivery_time"/>
+	                                    <field name="product_qty"/>
+	                                    <field name="remark"/>                             
 	                                    <field name="state" invisible="1"/>
 	                                </tree>
 	                            </field>
@@ -107,7 +111,7 @@
 	                            </group>
 	                            <div class="oe_clear"/>
 	                            
-	                            <field name="description" class="oe_inline" placeholder="Handling Security..."/>	                            
+	                            <field name="description" class="oe_inline" placeholder="Handling Security/Packaging Spec..."/>	                            
 	                        </page>
 	                        <page string="Remark">
 	                        	<field name="remark"/>
@@ -124,7 +128,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar,graph</field>
             <field name="help" type="html">
-                <p class="oe_view_nocontent_create">Create the first springback Order
+                <p class="oe_view_nocontent_create">Create the first NPI/Springback Order
                 </p>
             </field>
         </record>

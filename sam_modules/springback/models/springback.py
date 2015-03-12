@@ -8,6 +8,7 @@ _logger = logging.getLogger(__name__)
 
 from openerp import models, fields, api, exceptions
 from datetime import timedelta
+import math
 
 # 1. NPI 、Springback要区别开
 # 2. OEM,SLC,DC H/O date，要有Planned和Actual 
@@ -24,7 +25,7 @@ class springback_order(models.Model):
     _name = "springback.order"
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     _description = "springback Order"
-    _order = 'id desc'
+    _order = 'cnee_id, product_id, id'
     
     STATE_SELECTION = [
         ('draft', 'Draft'),
@@ -40,18 +41,19 @@ class springback_order(models.Model):
         #plt = 0
         if self.order_line:       
             for line in self.order_line:
-               qty += line.product_qty
-               #plt += line.product_plt
+                if line.pickup_point == "slc":
+                    qty += line.product_qty
+                
             
         self.qty = qty
         #self.plt = plt
         
     
-    product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('type', '<>', 'service')], states={'done': [('readonly', True)]})
-#     cnee_name = fields.Char('Name1', size=128)
+    product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('npi_ok', '=', 'True')], states={'done': [('readonly', True)]})
+#     cnee_name = fields.Char('Name1', size=128)            domain=[('type', '<>', 'service')], 
 #     sales_doc = fields.Char('Sales Doc', size=10)
 #     pono = fields.Char('Purchase Order#', size=32)       
-    cnee_id = fields.Many2one('res.partner', 'OEM', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
+    cnee_id = fields.Many2one('res.partner', 'OEM', required=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
                                  domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "Teacher")])    
 #     shpr_pt = fields.Char('ShPt', size=4)
 #     shpr_id = fields.Many2one('res.partner', 'Shipper', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
@@ -60,8 +62,18 @@ class springback_order(models.Model):
 #     org = fields.Char("Orig", compute='_org_get')
 #     dst = fields.Char("Dest", compute='_dst_get')
 #     tt = fields.Float("Transit Time", compute='_tt_get', help="Transit Time in days")
-    total_qty_plan = fields.Integer('Planned Volume', required=True)
-    total_qty = fields.Integer('Volume', required=True)
+    customer = fields.Selection([
+                        ('reseller', 'Reseller'),
+                        ('retail', 'Retail'),
+                        ('online', 'Online'),
+                        ('market1', 'Marketing Direct'),
+                        ('market2', 'Marketing Hub')],
+                'Customer',
+                help="""* this field representing the customer type                      
+                       \n* for products delivery
+                      """, select=True)
+    total_qty_plan = fields.Integer('Planned Volume')
+    total_qty = fields.Integer('Volume')
     volperplt = fields.Integer("Volume per Pallet", compute='_volperplt_get')
     qty = fields.Integer('Volume Subtotal', compute='_qty_all', help="The shipped Quantity of this order", multi="sums")    
     total_plt = fields.Integer('Pallet', compute='_calc_plt')
@@ -80,7 +92,7 @@ class springback_order(models.Model):
     eta = fields.Date('Ending Date', compute='_eta')
     
     description = fields.Text('Handling Security')
-    remark = fields.Text('Remark')      
+    remark = fields.Text('Remark')
     
     state = fields.Selection(STATE_SELECTION, 'Status', readonly=True,
                                   help=' * The \'Draft\' status is set automatically when purchase order in draft status. \
@@ -149,7 +161,8 @@ class springback_order(models.Model):
     @api.depends('total_qty', 'volperplt')
     def _calc_plt(self):
         if self.total_qty and self.volperplt:
-            self.total_plt = round(self.total_qty / self.volperplt)
+            self.total_plt = math.ceil(self.total_qty * 1.0 / self.volperplt)
+            #print math.ceil(self.total_qty / self.volperplt)
         else:
             self.total_plt = ""
             
@@ -162,20 +175,19 @@ class springback_order_line(models.Model):
     _name = 'springback.order.line'
     _description = 'springback Order Line'
     
-    category = fields.Selection([
-                        ('reseller', 'Reseller'),
-                        ('retail', 'Retail'),
-                        ('online', 'Online'),
-                        ('market1', 'Marketing Direct'),
-                        ('market2', 'Marketing Hub')],
-                'Customer Type', required=True,
-                help="""* this field representing the customer type                      
-                       \n* for products delivery
+    
+    pickup_point= fields.Selection([
+                        ('slc', 'SLC'),
+                        ('dc', 'HUB')],
+                'Pickup Point', required=True,
+                help="""* this field representing the location
+                       \n* where DHL pickup products
                       """, select=True)
     product_qty = fields.Integer('Volume', required=True, default=lambda *a: 1.0)
     #product_plt = fields.Integer('Pallet', required=True, default=lambda *a: 1.0)
-    date_shipped = fields.Date('Shipped Date', required=True, select=True)
-    dc_date = fields.Date('Marketing DC Shipped Date')  
+    pickup_time = fields.Datetime('Pickup Datetime', required=True, select=True)
+    delivery_time = fields.Datetime('Delivery Datetime')
+    remark = fields.Text('Remark')
     order_id = fields.Many2one('springback.order', 'Order Reference', select=True, required=True, ondelete='cascade')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed'), ('done', 'Done'), ('cancel', 'Cancelled')],
                               'Status', required=True, readonly=True, copy=False, default=lambda *args: 'draft',
