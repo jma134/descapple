@@ -26,9 +26,10 @@ class springback_order(models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     _description = "springback Order"
     _order = 'cnee_id, product_id, id'
+    _rec_name = 'qty'
     
     STATE_SELECTION = [
-        ('draft', 'Draft'),
+        ('draft', 'TBA'),
         ('shipping', 'Shipping'),
         ('done', 'Done'),
         ('cancel', 'Cancelled'),
@@ -48,7 +49,7 @@ class springback_order(models.Model):
         self.qty = qty
         #self.plt = plt
         
-    
+    #name = fields.Char('NPI Reference', default= '/')
     product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('npi_ok', '=', 'True')], states={'done': [('readonly', True)]})
 #     cnee_name = fields.Char('Name1', size=128)            domain=[('type', '<>', 'service')], 
 #     sales_doc = fields.Char('Sales Doc', size=10)
@@ -100,7 +101,10 @@ class springback_order(models.Model):
                                    \n* The \'Done\' status is set automatically when purchase order is set as done. \
                                    \n* The \'Cancelled\' status is set automatically when user cancel purchase order.',
                                   select=True, copy=False)
-     
+    
+    def create(self):        
+        self.message_post(cr, uid, [order], body=_("RFQ created"), context=context)
+        
     
     @api.one
     def action_draft(self):
