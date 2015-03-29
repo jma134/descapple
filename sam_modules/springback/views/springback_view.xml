@@ -2,7 +2,8 @@
 <openerp>
     <data>
         <menuitem name="NPI" id="menu_springback_root" sequence="110"/>
-		<menuitem id="menu_springback_main" name="NPI" parent="menu_springback_root" sequence="1"/>
+		<menuitem id="menu_springback_main" name="Operations" parent="menu_springback_root" sequence="1"/>
+		<menuitem id="menu_springback_configure" name="Configuration" parent="menu_springback_root" sequence="2"/>
 		
 <!--
     springback Order
@@ -15,11 +16,12 @@
                 <field name="cnee_id"/>
                 <field name="product_id"/>
                 <field name="customer"/>
-                <field name="qty"/>
+                <field name="itinerary"/>
+                <field name="total_qty_plan"/>                
                 <field name="total_qty"/>
                 <field name="total_plt"/>
-                <field name="oem_date"/>
-                <field name="slc_date"/>
+                <field name="planned_date"/>
+                <field name="actual_date"/>
                 <field name="taken_qty" widget="progressbar"/>                    
                 <field name="state"/>
             </tree>
@@ -31,7 +33,7 @@
             <field name="name">springback.order.calendar</field>
             <field name="model">springback.order</field>
             <field name="arch" type="xml">
-                <calendar string="Springback Calendar" date_start="slc_date" date_stop="dc_date"
+                <calendar string="Springback Calendar" date_start="planned_date" date_stop="actual_date"
                           color="product_id">
                     <field name="product_id"/>
                     <field name="total_qty"/>
@@ -66,30 +68,37 @@
                         
                         <field name="state" widget="statusbar"/>
                     </header>                        
-                    <sheet>	                    
+                    <sheet>
+                    	<div class="oe_title">
+	                        <h3>
+	                            <label string="Order#: " attrs="{'invisible': [('state','in',('draft'))]}"/>
+	                            <field name="name" class="oe_inline" readonly="1"/>
+	                        </h3>
+                    	</div>                  
                         <group>
-                            <group string="General">
+                            <group string="Apple Scheduled">
                                 <field name="cnee_id"/>
-	                            <field name="oem_date"/>    									
-                              	<field name="oem_date_actual"/>
-                                <field name="slc_date"/>
-                                <field name="slc_date_actual"/>
-                                <field name="dc_date"/>
-                                <field name="dc_date_actual"/>                            
+                                <field name="customer"/>
+                                <field name="oem_date" attrs="{'invisible': [('fm_oem','!=', True)]}"/>
+	                            <field name="planned_date"/>                              									
+     							<field name="total_qty_plan"/>
+                                <field name="security"/>
+                                <field name="taken_qty" widget="progressbar"/>                                                      
                             </group>
-                            <group string="Schedule">                                
-                            	<field name="customer"/>
-                                <field name="product_id"/>
-                                <field name="volperplt"/>
-                                <field name="total_qty_plan"/>
-                                <field name="total_qty"/>                                                                                                                          
+                            <group string="Acutally Happened ">
+                            	<field name="product_id"/>                                
+                            	<field name="itinerary"/>
+                            	<field name="oem_date_actual" attrs="{'invisible': [('fm_oem','!=', True)]}"/>
+                            	<field name="actual_date"/>
+                            	<field name="total_qty"/>                            	                             
+                                <field name="volperplt"/>                                                                                                 
                                 <field name="total_plt"/>
-                                <field name="taken_qty" widget="progressbar"/>                                                     							
+                                <field name="fm_oem" attrs="{'invisible': True}"/>                                                                                                          							
                             </group>
 						</group>                            
                            <notebook>
-                           	<page string="Shipment Info">
-	                            <field name="order_line">
+                           		<page string="Additional Info">
+	                            <!-- <field name="order_line">
 	                                <tree string="springback Order Lines" editable="bottom">	                                	
 	                                    <field name="pickup_point"/>
 	                                    <field name="pickup_time"/>
@@ -100,24 +109,22 @@
 	                                </tree>
 	                            </field>
 	                            <group class="oe_subtotal_footer oe_right">
-	                                <!-- <field name="qty" widget="monetary"/>
-	                                <field name="plt" widget="monetary"/>  -->                              
+	                                <field name="qty" widget="monetary"/>
+	                                <field name="plt" widget="monetary"/>                               
 	                                <div class="oe_subtotal_footer_separator oe_inline">
 	                                    <label for="qty"/>
 	                                </div>
 	                                <field name="qty" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
-	                                <!-- <div class="oe_subtotal_footer_separator oe_inline">
+	                                <div class="oe_subtotal_footer_separator oe_inline">
 	                                    <label for="plt"/>
 	                                </div>
-	                                <field name="plt" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/> -->
+	                                <field name="plt" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
 	                            </group>
-	                            <div class="oe_clear"/>
+	                            <div class="oe_clear"/> -->
 	                            
-	                            <field name="description" class="oe_inline" placeholder="Handling Security/Packaging Spec..."/>	                            
-	                        </page>
-	                        <page string="Remark">
-	                        	<field name="remark"/>
-	                        </page>          
+	                            <field name="description"  placeholder="Handling Security/Packaging Spec/Remark..."/>
+	                                                       
+	                        </page>        
 	                    </notebook>                        
                     </sheet>
                 </form>
@@ -125,7 +132,7 @@
         </record>
         
         <record model="ir.actions.act_window" id="action_springback_order_tree">
-            <field name="name">Order</field>
+            <field name="name">NPI Order</field>
             <field name="res_model">springback.order</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar,graph</field>
@@ -137,7 +144,62 @@
 
 		<menuitem action="action_springback_order_tree" id="menu_action_springback_order_tree" parent="menu_springback_main" sequence="1"/>
 		
-		
+
+<!--
+    Springback Itinerary
+-->	
+		<record  model="ir.ui.view" id="view_springback_itinerary_tree">
+            <field name="name">springback.itinerary.tree</field>
+            <field name="model">springback.itinerary</field>
+            <field name="arch" type="xml">
+                <tree string="Itinerary Tree">
+                    <field name="name"/>
+                    <field name="org"/>
+                    <field name="dst"/>                  
+
+                </tree>
+            </field>
+        </record>
+        
+		<record model="ir.ui.view" id="view_springback_itinerary_form">
+            <field name="name">springback.itinerary.form</field>
+            <field name="model">springback.itinerary</field>
+            <field name="arch" type="xml">
+                <form string="Course Form">
+                    <sheet>
+	                    <div class="oe_title">
+	                        <h4>
+	                            <label string="Itinerary: "/>
+	                            <field name="name" class="oe_inline" readonly="1"/>
+	                        </h4>
+	                    </div>
+                        <group>
+                            <group>                               
+                                <field name="org"/>
+                            </group>
+                            <group>	                            
+	                            <field name="dst"/>	                            
+                            </group>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+		<record model="ir.actions.act_window" id="action_springback_itinerary_tree">
+            <field name="name">Itinerary</field>
+            <field name="res_model">springback.itinerary</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first Itinerary for NPI/Springback Event
+                </p>
+            </field>
+        </record>
+
+		<menuitem action="action_springback_itinerary_tree" id="menu_action_springback_itinerary_tree" parent="menu_springback_configure" sequence="1"/>
+				
 		
 		<record model="ir.actions.act_window" id="action_springback_oem_tree">
             <field name="name">OEM</field>
@@ -145,8 +207,9 @@
             <field name="view_mode">tree,form</field>
         </record>
         <menuitem id="menu_action_springback_oem_tree" name="OEM"
-                  parent="menu_springback_main"
+                  parent="menu_springback_configure"
                   action="action_springback_oem_tree"/>
+
 		
                                        
     </data>
