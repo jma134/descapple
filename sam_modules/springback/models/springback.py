@@ -44,7 +44,7 @@ class springback_order(models.Model):
 #     sales_doc = fields.Char('Sales Doc', size=10)
 #     pono = fields.Char('Purchase Order#', size=32)       
     cnee_id = fields.Many2one('res.partner', 'OEM', required=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
-                                 domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "OEM")])    
+                                 domain=['|', ('category_id.name', 'ilike', "oem"),('category_id.name', 'ilike', "OEM")])    
 #     shpr_pt = fields.Char('ShPt', size=4)
 #     shpr_id = fields.Many2one('res.partner', 'Shipper', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
 #                                  domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "OEM")])
