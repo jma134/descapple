@@ -24,7 +24,7 @@ import math
 class springback_order(models.Model):
     _name = "springback.order"
     _inherit = ['mail.thread', 'ir.needaction_mixin']
-    _description = "springback Order"
+    _description = "Springback Order"
     _order = 'cnee_id, product_id, id'
 #     _rec_name = 'name'
     
@@ -36,9 +36,10 @@ class springback_order(models.Model):
     ]
     
         
-    name = fields.Char('Order Reference', required=True, select=True, copy=False,
+    name = fields.Char('Order#', required=True, select=True, copy=False,
                             help="Unique number of the NPI/Springback order, "
                                  "computed automatically when the order is created.", default='/')
+    #type = fields.Selection([('npi', 'NPI Order'), ('spb', 'Springback Order'), ('other', 'Other')], 'Order Type', default='spb', required=True, select=True, help="Order type specify")
     product_id = fields.Many2one('product.template', 'Material', required=True, select=True, domain=[('npi_ok', '=', 'True')], states={'done': [('readonly', True)]})
 #     cnee_name = fields.Char('Name1', size=128)            domain=[('type', '<>', 'service')], 
 #     sales_doc = fields.Char('Sales Doc', size=10)
@@ -101,14 +102,13 @@ class springback_order(models.Model):
                                    \n* The \'Cancelled\' status is set automatically when user cancel purchase order.',
                                   select=True, copy=False)
     
-    def create(self, cr, uid, vals, context=None):
-        print vals
-        if vals.get('name','/')=='/':
-            print "mmm"
-            vals['name'] = self.pool.get('ir.sequence').get(cr, uid, 'springback.order') or '/'
+    def create(self, cr, uid, vals, context=None):        
+        if vals.get('name','/')=='/':                  
+            #vals.get('type','O').upper()[:1]
+            seq_obj_name =  self._name
+            vals['name'] = 'S' + self.pool.get('ir.sequence').get(cr, uid, seq_obj_name) or '/'  
         #context = dict(context or {}, mail_create_nolog=True)
-        order =  super(springback_order, self).create(cr, uid, vals, context=context)
-        print vals
+        order =  super(springback_order, self).create(cr, uid, vals, context=context)        
         #self.message_post(cr, uid, [order], body=_("RFQ created"), context=context)
         return order
         
@@ -231,7 +231,7 @@ class springback_order(models.Model):
 #                                    \n* The \'Cancelled\' status is set automatically when user cancel purchase order.')
 
  
- #----------------------------------------------------------
+#----------------------------------------------------------
 # Springback Itinerary 
 #----------------------------------------------------------
 class springback_itinerary(models.Model):
@@ -267,3 +267,45 @@ class springback_itinerary(models.Model):
         
         #self.itinerary = self.org and self.org or '' + self.dst and self.dst or ''
         
+
+#----------------------------------------------------------
+# NPI Order 
+#----------------------------------------------------------
+class springback_order_npi(models.Model):
+    _name = "springback.order.npi"
+    _inherit = "springback.order"
+    _description = "NPI Order"
+    _order = 'cnee_id, product_id, id'
+    
+#     def create(self, cr, user, vals, context=None):
+#         if ('name' not in vals) or (vals.get('name')=='/') or (vals.get('name') == False):
+#             seq_obj_name =  self._name
+#             vals['name'] = self.pool.get('ir.sequence').get(cr, user, seq_obj_name)
+#         new_id = super(stock_picking, self).create(cr, user, vals, context)
+#         return new_id
+
+    def create(self, cr, uid, vals, context=None):        
+        if vals.get('name','/')=='/':
+            vals['name'] = 'N' + self.pool.get('ir.sequence').get(cr, uid, 'springback.order.npi') or '/'        
+        order =  super(springback_order_npi, self).create(cr, uid, vals, context=context)        
+        return order    
+    
+#     def create_workflow(self, cr, uid, ids, context=None):
+#         # overridden in order to trigger the workflow of stock.picking at the end of create,
+#         # write and unlink operation instead of its own workflow (which is not existing)
+#         return self.pool.get('springback.order').create_workflow(cr, uid, ids, context=context)
+# 
+#     def delete_workflow(self, cr, uid, ids, context=None):
+#         # overridden in order to trigger the workflow of stock.picking at the end of create,
+#         # write and unlink operation instead of its own workflow (which is not existing)
+#         return self.pool.get('springback.order').delete_workflow(cr, uid, ids, context=context)
+# 
+#     def step_workflow(self, cr, uid, ids, context=None):
+#         # overridden in order to trigger the workflow of stock.picking at the end of create,
+#         # write and unlink operation instead of its own workflow (which is not existing)
+#         return self.pool.get('springback.order').step_workflow(cr, uid, ids, context=context)
+# 
+#     def signal_workflow(self, cr, uid, ids, signal, context=None):
+#         # overridden in order to fire the workflow signal on given stock.picking workflow instance
+#         # instead of its own workflow (which is not existing)
+#         return self.pool.get('springback.order').signal_workflow(cr, uid, ids, signal, context=context)    
