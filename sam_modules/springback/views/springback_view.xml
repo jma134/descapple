@@ -4,7 +4,7 @@
         <menuitem name="NPI" id="menu_springback_root" sequence="110"/>
 		<menuitem id="menu_springback_main" name="Operations" parent="menu_springback_root" sequence="1"/>
 		<menuitem id="menu_springback_configure" name="Configuration" parent="menu_springback_root" sequence="2"/>
-		
+		<!-- <menuitem name="Products by Category" action="product.product_template_action" id="menu_springback_products_menu" parent="menu_springback_configure" sequence="1"/> -->
 <!--
     springback Order
 -->
@@ -320,11 +320,10 @@
             <field name="name">OEM</field>
             <field name="res_model">res.partner</field>
             <field name="view_mode">tree,form</field>
+            <field name="groups_id" eval="[(4, ref('group_springback_user'))]"/>
         </record>
-        <menuitem id="menu_action_springback_oem_tree" name="OEM"
-                  parent="menu_springback_configure"
-                  action="action_springback_oem_tree"/>
-
+        
+        <menuitem id="menu_action_springback_oem_tree" name="OEM" parent="menu_springback_configure" action="action_springback_oem_tree"/>
 		
                                        
     </data>

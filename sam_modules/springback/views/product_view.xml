@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
  <openerp>
-    <data>
-        <!-- Add instructor field to existing view -->
-        <record model="ir.ui.view" id="springback_product_form_view">
-            <field name="name">prodcut.volplt</field>
+    <data>    
+    	<record model="ir.ui.view" id="view_springback_product_tree">
+            <field name="name">product.template.springback.tree.inherit</field>
             <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="inherit_id" ref="product.product_template_tree_view"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                	<field name="vol_per_plt"/>
+                    <field name="npi_ok"/>                    
+                </field>
+            </field>
+        </record>
+        
+
+        <record model="ir.ui.view" id="springback_product_form_view">
+            <field name="name">prodcut.springback.tree.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="arch" type="xml">
             	<field name="sale_ok" position="before">
                     <div class="oe_left" name="options">
@@ -19,7 +31,7 @@
                     <field name="vol_per_plt"/>
                 </field>
             </field>            
-        </record>
+        </record> 
 
         <record model="ir.actions.act_window" id="action_springback_product_tree">
             <field name="name">Material</field>
@@ -27,7 +39,12 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-		<menuitem action="action_springback_product_tree" id="menu_action_springback_product_tree" parent="menu_springback_configure" sequence="1"/>
-		                  
+<!-- 		<menuitem
+            id="menu_action_springback_product_tree" name="Products"
+            parent="menu_springback_configure" sequence="45" groups="base.group_no_one"/> -->
+       
+	   
+    <menuitem action="action_springback_product_tree" id="menu_action_springback_product_tree" parent="menu_springback_configure" sequence="1"/>
+        		                  
     </data>
 </openerp>
