@@ -61,7 +61,6 @@
             <field name="condition">taken_qty &gt; 0</field>
         </record>
         
-        
 <!-- NPI -->        
         <record model="workflow" id="wkf_npi_order">
             <field name="name">NPI Workflow</field>
@@ -69,26 +68,26 @@
             <field name="on_create">True</field>
         </record>
 
-        <record model="workflow.activity" id="draft">
+        <record model="workflow.activity" id="npi_draft">
             <field name="name">Draft</field>
             <field name="wkf_id" ref="wkf_npi_order"/>
             <field name="flow_start" eval="True"/>
             <field name="kind">function</field>
             <field name="action">action_draft()</field>
         </record>
-        <record model="workflow.activity" id="shipping">
+        <record model="workflow.activity" id="npi_shipping">
             <field name="name">Shipping</field>
             <field name="wkf_id" ref="wkf_npi_order"/>
             <field name="kind">function</field>
             <field name="action">action_shipping()</field>
         </record>
-        <record model="workflow.activity" id="done">
+        <record model="workflow.activity" id="npi_done">
             <field name="name">Done</field>
             <field name="wkf_id" ref="wkf_npi_order"/>
             <field name="kind">function</field>
             <field name="action">action_done()</field>
         </record>
-        <record model="workflow.activity" id="cancel">
+        <record model="workflow.activity" id="npi_cancel">
             <field name="name">Cancel</field>
             <field name="wkf_id" ref="wkf_npi_order"/>
             <field name="kind">function</field>
@@ -96,31 +95,31 @@
         </record>
 
         <record model="workflow.transition" id="npi_draft_to_shipping">
-            <field name="act_from" ref="draft"/>
-            <field name="act_to" ref="shipping"/>
+            <field name="act_from" ref="npi_draft"/>
+            <field name="act_to" ref="npi_shipping"/>
             <field name="signal">shipping</field>
         </record>
         <record model="workflow.transition" id="npi_shipping_to_draft">
-            <field name="act_from" ref="shipping"/>
-            <field name="act_to" ref="draft"/>
+            <field name="act_from" ref="npi_shipping"/>
+            <field name="act_to" ref="npi_draft"/>
             <field name="signal">draft</field>
         </record>
         <record model="workflow.transition" id="npi_done_to_draft">
-            <field name="act_from" ref="done"/>
-            <field name="act_to" ref="draft"/>
+            <field name="act_from" ref="npi_done"/>
+            <field name="act_to" ref="npi_draft"/>
             <field name="signal">draft</field>
         </record>
         <record model="workflow.transition" id="npi_shipping_to_done">
-            <field name="act_from" ref="shipping"/>
-            <field name="act_to" ref="done"/>
+            <field name="act_from" ref="npi_shipping"/>
+            <field name="act_to" ref="npi_done"/>
             <field name="signal">done</field>
         </record>
         
         <record model="workflow.transition" id="npi_auto_shipping">
-            <field name="act_from" ref="draft"/>
-            <field name="act_to" ref="shipping"/>
+            <field name="act_from" ref="npi_draft"/>
+            <field name="act_to" ref="npi_shipping"/>
             <field name="condition">taken_qty &gt; 0</field>
-        </record>        
+        </record>                
         
     </data>
 </openerp>

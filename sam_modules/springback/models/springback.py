@@ -7,6 +7,7 @@ import logging
 _logger = logging.getLogger(__name__)
 
 from openerp import models, fields, api, exceptions
+from openerp.osv import osv
 from datetime import timedelta
 import math
 
@@ -40,11 +41,11 @@ class springback_order(models.Model):
                             help="Unique number of the NPI/Springback order, "
                                  "computed automatically when the order is created.", default='/')
     #type = fields.Selection([('npi', 'NPI Order'), ('spb', 'Springback Order'), ('other', 'Other')], 'Order Type', default='spb', required=True, select=True, help="Order type specify")
-    product_id = fields.Many2one('product.template', 'Material', required=True, select=True, domain=[('npi_ok', '=', 'True')], states={'done': [('readonly', True)]})
+    product_id = fields.Many2one('product.template', 'Material', required=True, select=True, track_visibility='always', domain=[('npi_ok', '=', 'True')], states={'done': [('readonly', True)]})
 #     cnee_name = fields.Char('Name1', size=128)            domain=[('type', '<>', 'service')], 
 #     sales_doc = fields.Char('Sales Doc', size=10)
 #     pono = fields.Char('Purchase Order#', size=32)       
-    cnee_id = fields.Many2one('res.partner', 'OEM', required=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
+    cnee_id = fields.Many2one('res.partner', 'OEM', required=True, track_visibility='always', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
                                  domain=['|', ('category_id.name', 'ilike', "oem"),('category_id.name', 'ilike', "OEM")])    
 #     shpr_pt = fields.Char('ShPt', size=4)
 #     shpr_id = fields.Many2one('res.partner', 'Shipper', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
@@ -71,7 +72,7 @@ class springback_order(models.Model):
                         ],
                 'Security Level')
     total_qty_plan = fields.Integer('Planned Volume')
-    total_qty = fields.Integer('Volume')
+    total_qty = fields.Integer('Volume', track_visibility='always')
     volperplt = fields.Integer("Volume per Pallet", compute='_volperplt_get')
     #qty = fields.Integer('Volume Subtotal', compute='_qty_all', help="The shipped Quantity of this order", multi="sums")    
     total_plt = fields.Integer('Pallet', compute='_calc_plt')
@@ -107,9 +108,10 @@ class springback_order(models.Model):
             #vals.get('type','O').upper()[:1]
             seq_obj_name =  self._name
             vals['name'] = 'S' + self.pool.get('ir.sequence').get(cr, uid, seq_obj_name) or '/'  
-        #context = dict(context or {}, mail_create_nolog=True)
+        context = dict(context or {}, mail_create_nolog=True)
         order =  super(springback_order, self).create(cr, uid, vals, context=context)        
-        #self.message_post(cr, uid, [order], body=_("RFQ created"), context=context)
+        self.message_post(cr, uid, [order], body="Springback order created", context=context)
+        
         return order
         
     
@@ -271,7 +273,7 @@ class springback_itinerary(models.Model):
 #----------------------------------------------------------
 # NPI Order 
 #----------------------------------------------------------
-class springback_order_npi(models.Model):
+class springback_order_npi(osv.osv):
     _name = "springback.order.npi"
     _inherit = "springback.order"
     _description = "NPI Order"
@@ -287,8 +289,12 @@ class springback_order_npi(models.Model):
     def create(self, cr, uid, vals, context=None):        
         if vals.get('name','/')=='/':
             vals['name'] = 'N' + self.pool.get('ir.sequence').get(cr, uid, 'springback.order.npi') or '/'        
-        order =  super(springback_order_npi, self).create(cr, uid, vals, context=context)        
-        return order    
+        context = dict(context or {}, mail_create_nolog=True)
+        order =  super(springback_order, self).create(cr, uid, vals, context=context)        
+        self.message_post(cr, uid, [order], body="Springback order created", context=context)        
+        return order
+    
+ 
     
 #     def create_workflow(self, cr, uid, ids, context=None):
 #         # overridden in order to trigger the workflow of stock.picking at the end of create,

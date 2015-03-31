@@ -40,6 +40,7 @@
         'views/product_view.xml',
         'views/springback_sequence.xml',
         'views/springback_workflow.xml',
+        
     ],
     'installable': True,
 #    'application': True,
