@@ -18,9 +18,9 @@
                 <field name="product_id"/>
                 <field name="customer"/>
                 <field name="itinerary"/>
-                <field name="total_qty_plan"/>                
-                <field name="total_qty"/>
-                <field name="total_plt"/>
+                <field name="total_qty_plan" sum="Total Planned Qty" string="Planned Qty"/>                
+                <field name="total_qty" sum="Total Qty" string="Total Qty"/>
+                <field name="total_plt" sum="Total Pallet"/>
                 <field name="planned_date"/>
                 <field name="actual_date"/>
                 <field name="taken_qty" widget="progressbar"/>                    
@@ -85,7 +85,7 @@
                         <button name="shipping" type="workflow" string="Shipping" states="draft" class="oe_highlight"/>
                         <button name="done" type="workflow" string="Mark as done" states="shipping" class="oe_highlight"/>
                         <button name="cancel" type="workflow" string="Cancel" states="draft,shipping"/>
-                        
+                        <button name="send_email_auto" string="Send Email" type="object" context="{'send_param':True}" class="oe_highlight"/>
                         <field name="state" widget="statusbar"/>
                     </header>                        
                     <sheet>
@@ -147,6 +147,10 @@
 	                        </page>        
 	                    </notebook>                        
                     </sheet>
+                    <div class="oe_chatter">
+	                    <field name="message_follower_ids" widget="mail_followers"/>
+	                    <field name="message_ids" widget="mail_thread"/>
+                	</div>
                 </form>
             </field>
         </record>

@@ -10,6 +10,7 @@ from openerp import models, fields, api, exceptions
 from openerp.osv import osv
 from datetime import timedelta
 import math
+from openerp.tools.translate import _
 
 # 1. NPI 銆丼pringback瑕佸尯鍒紑
 # 2. OEM,SLC,DC H/O date锛岃鏈塒lanned鍜孉ctual 
@@ -134,7 +135,79 @@ class springback_order(models.Model):
     @api.one
     def confirm_order(self):
         self.state = 'confirmed'
+    
+    def send_email_auto(self,cr,uid,ids,context=None):
+        email_template_obj = self.pool.get('email.template')
+        template_ids = email_template_obj.search(cr, uid, [('model_id.model', '=','springback.order')], context=context) 
+        print template_ids
         
+        
+        # send email to users with their signup url
+        template = False
+        template = self.pool.get('ir.model.data').get_object(cr, uid, 'auth_signup', 'reset_password_email')
+        assert template._name == 'email.template'
+        print template.id
+        print ids
+
+#         for user in self.browse(cr, uid, ids, context):
+#             if not user.email:
+#                 raise osv.except_osv(_("Cannot send email: user has no email address."), user.name)
+
+        self.pool.get('email.template').send_mail(cr, uid, 12, 2, force_send=True, raise_exception=True, context=context)
+            
+#         if template_ids:
+#             values = email_template_obj.generate_email(cr, uid, template_ids[0], ids[0], context=context)
+#             """values['subject'] = subject 
+#             values['email_to'] = email_to
+#             values['body_html'] = body_html
+#             values['body'] = body_html"""
+#             values['res_id'] = False
+#             mail_mail_obj = self.pool.get('mail.mail')
+#             msg_id = mail_mail_obj.create(cr, uid, values, context=context)
+#             if msg_id:
+#                 mail_mail_obj.send(cr, uid, [msg_id], context=context) 
+#         return True
+     
+     
+    def send_spb_email(self, cr, uid, ids, context=None):
+        '''
+        This function opens a window to compose an email, with the edi purchase template message loaded by default
+        '''
+        if not context:
+            context= {}
+        ir_model_data = self.pool.get('ir.model.data')
+#         try:
+#             if context.get('send_param', False):
+#                 template_id = ir_model_data.get_object_reference(cr, uid, 'purchase', 'email_template_edi_purchase')[1]
+#             else:
+#                 template_id = ir_model_data.get_object_reference(cr, uid, 'purchase', 'email_template_edi_purchase_done')[1]
+#         except ValueError:
+#             template_id = False
+        template_id = 12
+        try:
+            compose_form_id = ir_model_data.get_object_reference(cr, uid, 'mail', 'email_compose_message_wizard_form')[1]
+        except ValueError:
+            compose_form_id = False 
+        ctx = dict(context)
+        ctx.update({
+            'default_model': 'springback.order',
+            'default_res_id': ids[0],
+            'default_use_template': bool(template_id),
+            'default_template_id': template_id,
+            'default_composition_mode': 'comment',
+        })
+        return {
+            'name': _('Compose Email'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        }
+            
                
     @api.one
     @api.depends('total_qty', 'total_qty_plan')
