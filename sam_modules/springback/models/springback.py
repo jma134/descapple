@@ -34,7 +34,7 @@ class springback_order(models.Model):
         ('draft', 'TBA'),
         ('shipping', 'Shipping'),
         ('done', 'Done'),
-        ('cancel', 'Cancelled'),
+        ('archive', 'Archived'),
     ]
     
         
@@ -129,12 +129,12 @@ class springback_order(models.Model):
         self.state = 'done'
 
     @api.one
-    def action_cancel(self):
-        self.state = 'cancel'
+    def action_archive(self):
+        self.state = 'archive'
         
-    @api.one
-    def confirm_order(self):
-        self.state = 'confirmed'
+#     @api.one
+#     def confirm_order(self):
+#         self.state = 'confirmed'
     
     def send_email_auto(self,cr,uid,ids,context=None):
         email_template_obj = self.pool.get('email.template')

@@ -84,7 +84,7 @@
                         <button name="draft" type="workflow" string="Reset to TBA" states="shipping,done"/>
                         <button name="shipping" type="workflow" string="Shipping" states="draft" class="oe_highlight"/>
                         <button name="done" type="workflow" string="Mark as done" states="shipping" class="oe_highlight"/>
-                        <button name="cancel" type="workflow" string="Cancel" states="draft,shipping"/>
+                        <button name="archive" type="workflow" string="Archive" states="done"/>
                         <button name="send_email_auto" string="Send Email" type="object" context="{'send_param':True}" class="oe_highlight"/>
                         <field name="state" widget="statusbar"/>
                     </header>                        

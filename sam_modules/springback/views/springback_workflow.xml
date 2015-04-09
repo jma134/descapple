@@ -27,11 +27,11 @@
             <field name="kind">function</field>
             <field name="action">action_done()</field>
         </record>
-        <record model="workflow.activity" id="cancel">
-            <field name="name">Cancel</field>
+        <record model="workflow.activity" id="archive">
+            <field name="name">Archive</field>
             <field name="wkf_id" ref="wkf_springback_order"/>
             <field name="kind">function</field>
-            <field name="action">action_cancel()</field>
+            <field name="action">action_archive()</field>
         </record>
 
         <record model="workflow.transition" id="sprinback_draft_to_shipping">
@@ -53,6 +53,11 @@
             <field name="act_from" ref="shipping"/>
             <field name="act_to" ref="done"/>
             <field name="signal">done</field>
+        </record>
+        <record model="workflow.transition" id="sprinback_done_to_archive">
+            <field name="act_from" ref="done"/>
+            <field name="act_to" ref="archive"/>
+            <field name="signal">archive</field>
         </record>
         
         <record model="workflow.transition" id="sprinback_auto_shipping">
