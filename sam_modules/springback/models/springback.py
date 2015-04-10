@@ -388,3 +388,22 @@ class springback_order_npi(osv.osv):
 #         # overridden in order to fire the workflow signal on given stock.picking workflow instance
 #         # instead of its own workflow (which is not existing)
 #         return self.pool.get('springback.order').signal_workflow(cr, uid, ids, signal, context=context)    
+
+
+#----------------------------------------------------------
+# Springback Customer 
+#----------------------------------------------------------
+class springback_customer(models.Model):
+    _name = 'springback.customer'        
+    _description = "Types of Customer"
+    _order = 'sequence'
+    
+    name = fields.Char(string='Customer Type', required=True)
+    sequence = fields.Integer(string='Sequence')
+
+    
+    _defaults = {
+        'sequence': lambda self, cr, uid, ctx: 0,
+    }
+
+   

@@ -160,6 +160,7 @@
             <field name="res_model">springback.order</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar,graph</field>
+            <field name="domain">[('state','in',('draft','shipping','done'))]</field>
             <field name="search_view_id" ref="view_springback_order_search"/>
             <!-- <field name="context">{'search_default_in_location':1}</field> -->
             <field name="help" type="html">
@@ -252,7 +253,7 @@
         </record>
         
         
-<record id="view_springback_order_npi_form" model="ir.ui.view">
+		<record id="view_springback_order_npi_form" model="ir.ui.view">
             <field name="name">springback.order.npi.form</field>
             <field name="model">springback.order.npi</field>	
             <field name="arch" type="xml">
@@ -315,7 +316,54 @@
         </record>        
         
         <menuitem action="action_springback_order_npi_tree" id="menu_action_springback_order_npi_tree" parent="menu_springback_main" sequence="2"/>
+
+
+<!--
+    Springback Customer
+-->
+        <record model="ir.ui.view" id="view_springback_customer_tree">
+            <field name="name">springback.customer.tree</field>
+            <field name="model">springback.customer</field>
+            <field name="arch" type="xml">
+                <tree string="Customers">
+                    <field name="sequence" widget="handle" />
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+      
+		<record id="view_springback_customer_form" model="ir.ui.view">
+            <field name="name">springback.customer.form</field>
+            <field name="model">springback.customer</field>	
+            <field name="arch" type="xml">
+                <form string="NPI Order Form">
+                	<sheet>
+                        <group>
+                            <group>                               
+                                <field name="name"/>
+                            </group>
+                            <group>	                            
+	                            <field name="sequence"/>	                            
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
         
+        <record model="ir.actions.act_window" id="action_springback_customer_tree">
+            <field name="name">Types of Customer</field>
+            <field name="res_model">springback.customer</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first Customer Type
+                </p>
+            </field>
+        </record> 
+        
+        <menuitem action="action_springback_customer_tree" id="menu_action_springback_customer_tree" parent="menu_springback_configure" sequence="2"/>        
+                
         
 <!--
     Partner
