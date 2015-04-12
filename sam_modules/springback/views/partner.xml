@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <openerp>
+    <data>
+        <!-- Add instructor field to existing view -->
+        <record model="ir.ui.view" id="partner_instructor_form_view">
+            <field name="name">partner.instructor</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Team Recipients">
+                        <group>                       	
+                        	<field name="recipients_ids" widget="many2many_tags_email" placeholder="Add recipients to notify..."
+                                context="{'force_email':True, 'show_email':True}"/>                        	
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_springback_oem_tree">
+            <field name="name">OEM</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+		<menuitem id="menu_action_springback_oem_tree" name="OEM" parent="menu_springback_configure" action="action_springback_oem_tree"/>                  
+    </data>
+</openerp>

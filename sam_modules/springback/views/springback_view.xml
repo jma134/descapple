@@ -113,7 +113,7 @@
                             	<field name="total_qty"/>                            	                             
                                 <field name="volperplt"/>                                                                                                 
                                 <field name="total_plt"/>
-                                <field name="fm_oem" attrs="{'invisible': True}"/>                                                                                                           							
+                                <field name="fm_oem" attrs="{'invisible': True}"/>                                                                                                         							
                             </group>
 						</group>                            
                            <notebook>
@@ -362,13 +362,13 @@
             </field>
         </record> 
         
-        <menuitem action="action_springback_customer_tree" id="menu_action_springback_customer_tree" parent="menu_springback_configure" sequence="2"/>        
+        <menuitem action="action_springback_customer_tree" id="menu_action_springback_customer_tree" parent="menu_springback_configure" sequence="1"/>        
                 
         
 <!--
     Partner
 -->	
-		<record model="ir.actions.act_window" id="action_springback_oem_tree">
+<!-- 		<record model="ir.actions.act_window" id="action_springback_oem_tree">
             <field name="name">OEM</field>
             <field name="res_model">res.partner</field>
             <field name="view_mode">tree,form</field>
@@ -376,7 +376,7 @@
         </record>
         
         <menuitem id="menu_action_springback_oem_tree" name="OEM" parent="menu_springback_configure" action="action_springback_oem_tree"/>
-		
+	 -->	
                                        
     </data>
 </openerp>

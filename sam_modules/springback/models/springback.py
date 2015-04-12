@@ -137,23 +137,24 @@ class springback_order(models.Model):
 #         self.state = 'confirmed'
     
     def send_email_auto(self,cr,uid,ids,context=None):
-        email_template_obj = self.pool.get('email.template')
-        template_ids = email_template_obj.search(cr, uid, [('model_id.model', '=','springback.order')], context=context) 
-        print template_ids
+        #email_template_obj = self.pool.get('email.template')
+        #template_ids = email_template_obj.search(cr, uid, [('model_id.model', '=','springback.order')], context=context) 
+        #print template_ids
         
         
         # send email to users with their signup url
         template = False
-        template = self.pool.get('ir.model.data').get_object(cr, uid, 'auth_signup', 'reset_password_email')
+        #template = self.pool.get('ir.model.data').get_object(cr, uid, 'auth_signup', 'reset_password_email')
+        template = self.pool.get('ir.model.data').get_object(cr, uid, 'springback', 'email_template_edi_springback')
         assert template._name == 'email.template'
-        print template.id
-        print ids
+        #print template.id
+        #print ids,ids[0]
 
 #         for user in self.browse(cr, uid, ids, context):
 #             if not user.email:
 #                 raise osv.except_osv(_("Cannot send email: user has no email address."), user.name)
-
-        self.pool.get('email.template').send_mail(cr, uid, 12, 2, force_send=True, raise_exception=True, context=context)
+#         self.pool.get('email.template').send_mail(cr, uid, template.id, user.id, force_send=True, raise_exception=True, context=context) //auth_signup
+        self.pool.get('email.template').send_mail(cr, uid, template.id, ids[0], force_send=True, raise_exception=True, context=context)
             
 #         if template_ids:
 #             values = email_template_obj.generate_email(cr, uid, template_ids[0], ids[0], context=context)
@@ -169,7 +170,7 @@ class springback_order(models.Model):
 #         return True
      
      
-    def send_spb_email(self, cr, uid, ids, context=None):
+    def send_email_spb(self, cr, uid, ids, context=None):
         '''
         This function opens a window to compose an email, with the edi purchase template message loaded by default
         '''

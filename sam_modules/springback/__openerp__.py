@@ -37,10 +37,11 @@
         'security/ir.model.access.csv',
         #'wizard/vmi_location_product_view.xml',
         'views/springback_view.xml',
+        'views/partner.xml',
         'views/product_view.xml',
         'views/springback_sequence.xml',
         'views/springback_workflow.xml',
-        
+        'views/springback_eml_data.xml',        
     ],
     'installable': True,
 #    'application': True,

@@ -21,3 +21,4 @@
 
 import springback
 import product
+import partner
