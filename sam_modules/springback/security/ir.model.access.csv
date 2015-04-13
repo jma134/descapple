@@ -2,9 +2,11 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_springback_order_manager,springback.order.manager,model_springback_order,springback.group_springback_manager,1,1,1,1
 access_springback_npi_manager,springback.npi.manager,model_springback_order_npi,springback.group_springback_manager,1,1,1,1
 access_springback_itinerary_manager,springback.itinerary.manager,model_springback_itinerary,springback.group_springback_manager,1,1,1,1
+access_springback_customer_manager,springback.customer.manager,model_springback_customer,springback.group_springback_manager,1,1,1,1
 access_springback_order_user,springback.order.user,model_springback_order,springback.group_springback_user,1,1,1,0
 access_springback_npi_user,springback.npi.user,model_springback_order_npi,springback.group_springback_user,1,1,1,0
 access_springback_itinerary_user,springback.itinerary.user,model_springback_itinerary,springback.group_springback_user,1,1,1,0
+access_springback_customer_user,springback.customer.user,model_springback_customer,springback.group_springback_user,1,1,1,0
 access_springback_product_template_user,product.template springback_user,product.model_product_template,springback.group_springback_user,1,1,1,0
 access_springback_product_template_manager,product.template springback_manager,product.model_product_template,springback.group_springback_manager,1,1,1,0
 access_springback_product_product_user,product.product springback_user,product.model_product_product,springback.group_springback_user,1,1,1,0
