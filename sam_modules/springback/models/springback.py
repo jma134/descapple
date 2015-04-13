@@ -55,16 +55,20 @@ class springback_order(models.Model):
 #     org = fields.Char("Orig", compute='_org_get')
 #     dst = fields.Char("Dest", compute='_dst_get')
 #     tt = fields.Float("Transit Time", compute='_tt_get', help="Transit Time in days")
-    customer = fields.Selection([
-                        ('reseller', 'Reseller'),
-                        ('retail', 'Retail'),
-                        ('online', 'Online'),
-                        ('market1', 'Marketing Direct'),
-                        ('market2', 'Marketing Hub')],
-                'Customer',
+#     customer = fields.Selection([
+#                         ('reseller', 'Reseller'),
+#                         ('retail', 'Retail'),
+#                         ('online', 'Online'),
+#                         ('market1', 'Marketing Direct'),
+#                         ('market2', 'Marketing Hub')],
+#                 'Customer',
+#                 help="""* this field representing the customer type                      
+#                        \n* for products delivery
+#                       """, select=True)
+    customer = fields.Many2one('springback.customer', 'Customer',
                 help="""* this field representing the customer type                      
                        \n* for products delivery
-                      """, select=True)
+                      """, select=True)    
     itinerary = fields.Many2one('springback.itinerary', 'Itinerary', required=True)
     security = fields.Selection([
                         ('std', 'Standard'),

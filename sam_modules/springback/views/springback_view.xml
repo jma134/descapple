@@ -3,7 +3,8 @@
     <data>
         <menuitem name="NPI" id="menu_springback_root" sequence="110"/>
 		<menuitem id="menu_springback_main" name="Operations" parent="menu_springback_root" sequence="1"/>
-		<menuitem id="menu_springback_configure" name="Configuration" parent="menu_springback_root" sequence="2"/>
+		<menuitem id="menu_springback_configure" name="Configuration" parent="menu_springback_root" sequence="9"/>
+		<menuitem id="menu_springback_history" name="History Orders" parent="menu_springback_root" sequence="3"/>
 		<!-- <menuitem name="Products by Category" action="product.product_template_action" id="menu_springback_products_menu" parent="menu_springback_configure" sequence="1"/> -->
 <!--
     springback Order
@@ -251,6 +252,49 @@
             </tree>
             </field>
         </record>
+
+        <record id="view_springback_order_npi_calendar" model="ir.ui.view">
+            <field name="name">springback.order.npi.calendar</field>
+            <field name="model">springback.order.npi</field>
+            <field name="arch" type="xml">
+                <calendar string="NPI Calendar" date_start="planned_date" date_stop="actual_date"
+                          color="product_id">
+                    <field name="product_id"/>
+                    <field name="total_qty_plan"/>
+                </calendar>
+            </field>
+        </record>
+        
+        <!-- graph view -->
+         <record id="view_springback_order_npi_graph" model="ir.ui.view">
+            <field name="name">springback.order.npi.graph</field>
+            <field name="model">springback.order.npi</field>
+            <field name="arch" type="xml">
+                <graph string="Pallet by OEM">
+                    <field name="cnee_id"/>
+                    <field name="product_id"/>
+                    <field name="total_qty_plan" type="measure"/>
+                </graph>
+            </field>
+        </record>
+        
+        <record id="view_springback_order_npi_search" model="ir.ui.view">
+            <field name="name">springback.order.npi.search</field>
+            <field name="model">springback.order.npi</field>
+            <field name="arch" type="xml">
+                <search string="NPI Search">                	
+                    <field name="name" string="Order Reference"/>
+                    <field name="cnee_id"/>
+                    <field name="product_id"/>
+                    <filter icon="terp-go-home" name="in_process" string="WIP" domain="[('state', 'in', ['draft','shipping'])]" help="working in process"/>                    
+                    <group expand="0" string="Group By...">
+                    	<filter string="OEM" icon="terp-go-month" domain="[]" context="{'group_by':'cnee_id'}" help="Order by OEM"/>
+                    	<filter string="Material" icon="terp-go-month" domain="[]" context="{'group_by':'product_id'}" help="Order by Material"/>                        
+                        <filter string="Status" icon="terp-go-month" domain="[]" context="{'group_by':'state'}" help="Order by Status"/>
+                    </group>
+                </search>                
+            </field>
+        </record>  
         
         
 		<record id="view_springback_order_npi_form" model="ir.ui.view">
@@ -263,7 +307,7 @@
                         <button name="shipping" type="workflow" string="Shipping" states="draft" class="oe_highlight"/>
                         <button name="done" type="workflow" string="Mark as done" states="shipping" class="oe_highlight"/>
                         <button name="cancel" type="workflow" string="Cancel" states="draft,shipping"/>
-                        
+                        <button name="archive" type="workflow" string="Archive" states="done"/>
                         <field name="state" widget="statusbar"/>
                     </header>                        
                     <sheet>
@@ -300,6 +344,10 @@
 	                        </page>        
 	                    </notebook>                        
                     </sheet>
+                    <div class="oe_chatter">
+	                    <field name="message_follower_ids" widget="mail_followers"/>
+	                    <field name="message_ids" widget="mail_thread"/>
+                	</div>
                 </form>
             </field>
         </record>
@@ -308,7 +356,8 @@
             <field name="name">NPI Order</field>
             <field name="res_model">springback.order.npi</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,calendar,graph</field>
+            <field name="search_view_id" ref="view_springback_order_npi_search"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">Create the first NPI Order
                 </p>
@@ -362,7 +411,7 @@
             </field>
         </record> 
         
-        <menuitem action="action_springback_customer_tree" id="menu_action_springback_customer_tree" parent="menu_springback_configure" sequence="1"/>        
+        <menuitem action="action_springback_customer_tree" id="menu_action_springback_customer_tree" parent="menu_springback_configure" sequence="0"/>        
                 
         
 <!--
@@ -376,7 +425,169 @@
         </record>
         
         <menuitem id="menu_action_springback_oem_tree" name="OEM" parent="menu_springback_configure" action="action_springback_oem_tree"/>
-	 -->	
+	 -->
+	 
+<!--
+    Springback Order History
+-->
+		<record id="view_springback_order_history_tree" model="ir.ui.view">
+            <field name="name">springback.order.history.tree</field>
+            <field name="model">springback.order</field>
+            <field name="arch" type="xml">
+            <tree string="Springback Order History List">
+				<field name="name"/>
+                <field name="cnee_id"/>
+                <field name="product_id"/>
+                <field name="customer"/>
+                <field name="itinerary"/>
+                <field name="total_qty_plan"/>                
+                <field name="total_qty"/>
+                <field name="total_plt"/>
+                <field name="planned_date"/>
+                <field name="actual_date"/>                                   
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>
+        
+        
+		<record id="view_springback_order_history_form" model="ir.ui.view">
+            <field name="name">springback.order.history.form</field>
+            <field name="model">springback.order</field>	
+            <field name="arch" type="xml">
+                <form string="Springback Order History Form">                       
+                    <sheet>
+                    	<div class="oe_title">
+	                        <h2>
+	                            <label string="Order#: " attrs="{'invisible': [('state','in',('draft'))]}"/>
+	                            <field name="name" class="oe_inline" readonly="1"/>
+	                        </h2>
+                    	</div>                  
+                        <group>
+                            <group string="Apple Scheduled">
+                                <field name="cnee_id"/>
+                                <field name="customer"/>
+                                <field name="oem_date" attrs="{'invisible': [('fm_oem','!=', True)]}"/>
+	                            <field name="planned_date"/>                              									
+     							<field name="total_qty_plan"/>
+                                <field name="security"/>                                                                                  
+                            </group>
+                            <group string="Acutally Happened ">
+                            	<field name="product_id"/>                                
+                            	<field name="itinerary"/>
+                            	<field name="oem_date_actual" attrs="{'invisible': [('fm_oem','!=', True)]}"/>
+                            	<field name="actual_date"/>
+                            	<field name="total_qty"/>                            	                             
+                                <field name="volperplt"/>                                                                                                 
+                                <field name="total_plt"/>
+                                <field name="fm_oem" attrs="{'invisible': True}"/>                                                                                                                                           							
+                            </group>
+						</group>                            
+                        <notebook>
+                           	<page string="Additional Info">                          
+	                            <field name="description"  placeholder="Handling Security/Packaging Spec/Remark..."/>	                                                       
+	                        </page>        
+	                    </notebook>                        
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_springback_order_history_tree">
+            <field name="name">Springback Order History</field>
+            <field name="res_model">springback.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+			<field name="domain">[('state','=','archive')]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first history Order
+                </p>
+            </field>
+        </record>        
+        
+        <menuitem action="action_springback_order_history_tree" id="menu_action_springback_order_history_tree" parent="menu_springback_history" sequence="1"/>
+	 	
+
+<!--
+    NPI Order History
+-->
+		<record id="view_springback_order_npi_history_tree" model="ir.ui.view">
+            <field name="name">springback.order.npi.history.tree</field>
+            <field name="model">springback.order.npi</field>
+            <field name="arch" type="xml">
+            <tree string="NPI Order History List">
+				<field name="name"/>
+                <field name="cnee_id"/>
+                <field name="product_id"/>
+                <field name="customer"/>
+                <field name="itinerary"/>
+                <field name="total_qty_plan"/>                
+                <field name="total_qty"/>
+                <field name="total_plt"/>
+                <field name="planned_date"/>
+                <field name="actual_date"/>                                   
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>
+        
+        
+		<record id="view_springback_order_npi_history_form" model="ir.ui.view">
+            <field name="name">springback.order.npi.history.form</field>
+            <field name="model">springback.order.npi</field>	
+            <field name="arch" type="xml">
+                <form string="NPI Order History Form">                       
+                    <sheet>
+                    	<div class="oe_title">
+	                        <h2>
+	                            <label string="Order#: " attrs="{'invisible': [('state','in',('draft'))]}"/>
+	                            <field name="name" class="oe_inline" readonly="1"/>
+	                        </h2>
+                    	</div>                  
+                        <group>
+                            <group string="Apple Scheduled">
+                                <field name="cnee_id"/>
+                                <field name="customer"/>
+                                <field name="oem_date" attrs="{'invisible': [('fm_oem','!=', True)]}"/>
+	                            <field name="planned_date"/>                              									
+     							<field name="total_qty_plan"/>
+                                <field name="security"/>                                                                                  
+                            </group>
+                            <group string="Acutally Happened ">
+                            	<field name="product_id"/>                                
+                            	<field name="itinerary"/>
+                            	<field name="oem_date_actual" attrs="{'invisible': [('fm_oem','!=', True)]}"/>
+                            	<field name="actual_date"/>
+                            	<field name="total_qty"/>                            	                             
+                                <field name="volperplt"/>                                                                                                 
+                                <field name="total_plt"/>
+                                <field name="fm_oem" attrs="{'invisible': True}"/>                                                                                                                                           							
+                            </group>
+						</group>                            
+                        <notebook>
+                           	<page string="Additional Info">                          
+	                            <field name="description"  placeholder="Handling Security/Packaging Spec/Remark..."/>	                                                       
+	                        </page>        
+	                    </notebook>                        
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_springback_order_npi_history_tree">
+            <field name="name">NPI Order History</field>
+            <field name="res_model">springback.order.npi</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+			<field name="domain">[('state','=','archive')]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first history Order
+                </p>
+            </field>
+        </record>        
+        
+        <menuitem action="action_springback_order_npi_history_tree" id="menu_action_springback_order_npi_history_tree" parent="menu_springback_history" sequence="2"/>
+	 		 	
                                        
     </data>
 </openerp>

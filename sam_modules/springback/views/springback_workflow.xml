@@ -92,11 +92,11 @@
             <field name="kind">function</field>
             <field name="action">action_done()</field>
         </record>
-        <record model="workflow.activity" id="npi_cancel">
-            <field name="name">Cancel</field>
+        <record model="workflow.activity" id="npi_archive">
+            <field name="name">Archive</field>
             <field name="wkf_id" ref="wkf_npi_order"/>
             <field name="kind">function</field>
-            <field name="action">action_cancel()</field>
+            <field name="action">action_archive()</field>
         </record>
 
         <record model="workflow.transition" id="npi_draft_to_shipping">
@@ -119,6 +119,11 @@
             <field name="act_to" ref="npi_done"/>
             <field name="signal">done</field>
         </record>
+        <record model="workflow.transition" id="npi_done_to_archive">
+            <field name="act_from" ref="npi_done"/>
+            <field name="act_to" ref="npi_archive"/>
+            <field name="signal">archive</field>
+        </record>        
         
         <record model="workflow.transition" id="npi_auto_shipping">
             <field name="act_from" ref="npi_draft"/>
