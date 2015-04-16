@@ -357,6 +357,7 @@
             <field name="res_model">springback.order.npi</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar,graph</field>
+            <field name="domain">[('state','in',('draft','shipping','done'))]</field>
             <field name="search_view_id" ref="view_springback_order_npi_search"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">Create the first NPI Order
@@ -547,7 +548,7 @@
                         <group>
                             <group string="Apple Scheduled">
                                 <field name="cnee_id"/>
-                                <field name="customer"/>
+                                <!-- <field name="customer"/> -->
                                 <field name="oem_date" attrs="{'invisible': [('fm_oem','!=', True)]}"/>
 	                            <field name="planned_date"/>                              									
      							<field name="total_qty_plan"/>

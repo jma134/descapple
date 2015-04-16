@@ -37,6 +37,23 @@ class springback_order(models.Model):
         ('archive', 'Archived'),
     ]
     
+    
+    def _get_default_customer(self, cr, uid, context=None):        
+        type_obj = self.pool.get('springback.customer')
+#         user_obj = self.pool.get('res.users')
+#         company_id = user_obj.browse(cr, uid, uid, context=context).company_id.id
+        types = type_obj.search(cr, uid, [('sequence', '=', 1)], limit = 2, order='id desc', context=context)
+        res = {}
+        print types
+        if not types:            
+#             types = type_obj.search(cr, uid, [('code', '=', 'incoming'), ('warehouse_id', '=', False)], context=context)
+#             raise osv.except_osv(_('Error!'), _("Make sure you have at least an incoming picking type defined"))
+            return False
+        else:
+            print "xxx"
+            res['value'] = {'total_qty': 99}
+            return res
+    
         
     name = fields.Char('Order#', required=True, select=True, copy=False,
                             help="Unique number of the NPI/Springback order, "
@@ -107,6 +124,12 @@ class springback_order(models.Model):
                                    \n* The \'Done\' status is set automatically when purchase order is set as done. \
                                    \n* The \'Cancelled\' status is set automatically when user cancel purchase order.',
                                   select=True, copy=False)
+    
+    
+    
+    _defaults = {
+        'customer': _get_default_customer,
+    }
     
     def create(self, cr, uid, vals, context=None):        
         if vals.get('name','/')=='/':                  
