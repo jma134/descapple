@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+    	<record id="view_transport_prealert_form" model="ir.ui.view">
+            <field name="name">transport.prealert.form</field>
+            <field name="model">transport.prealert</field>
+            <field name="arch" type="xml">
+                <form string="Pre-Alert charts">
+                    <group>
+
+                        <field name="target_move"/>
+                        <label for="period_from" string="Periods"/>
+                        <div>
+                            <field name="period_from" class="oe_inline"/> - 
+                            <field name="period_to" class="oe_inline"/>
+                        </div>
+                    </group>
+                    <footer>
+                        <button string="Open Alerts" name="transport_prealert_open_window" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_transport_prealert_wizard" model="ir.actions.act_window">
+            <field name="name">Chart of Accounts</field>
+            <field name="res_model">transport.prealert</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_transport_prealert_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem icon="STOCK_INDENT" action="action_transport_prealert_wizard"
+            id="menu_action_transport_prealert_tree2"
+            parent="menu_transport_wizard" />
+		
+                                       
+    </data>
+</openerp>

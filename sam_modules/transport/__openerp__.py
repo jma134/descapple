@@ -39,6 +39,7 @@
         'views/transport_view.xml',
         'views/partner.xml',
         'views/session_workflow.xml',
+        'views/prealert_view.xml',
     ],
     'installable': True,
 #    'application': True,

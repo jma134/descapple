@@ -37,22 +37,13 @@ class springback_order(models.Model):
         ('archive', 'Archived'),
     ]
     
-    
-    def _get_default_customer(self, cr, uid, context=None):        
-        type_obj = self.pool.get('springback.customer')
-#         user_obj = self.pool.get('res.users')
-#         company_id = user_obj.browse(cr, uid, uid, context=context).company_id.id
-        types = type_obj.search(cr, uid, [('sequence', '=', 1)], limit = 2, order='id desc', context=context)
-        res = {}
-        print types
-        if not types:            
-#             types = type_obj.search(cr, uid, [('code', '=', 'incoming'), ('warehouse_id', '=', False)], context=context)
-#             raise osv.except_osv(_('Error!'), _("Make sure you have at least an incoming picking type defined"))
-            return False
-        else:
-            print "xxx"
-            res['value'] = {'total_qty': 99}
-            return res
+    def _get_customer(self, cr, uid, context=None):
+        print "mmm"
+        res = self.pool.get('res.company').search(cr, uid, [('currency_id','=','EUR')], context=context)
+        print res, res[0]
+        #self.pool.get('springback.customer').find(cr, uid, context=context)
+        return res and res[0] or False
+        
     
         
     name = fields.Char('Order#', required=True, select=True, copy=False,
@@ -85,7 +76,7 @@ class springback_order(models.Model):
     customer = fields.Many2one('springback.customer', 'Customer',
                 help="""* this field representing the customer type                      
                        \n* for products delivery
-                      """, select=True)    
+                      """, select=True, defatul=_get_customer)    
     itinerary = fields.Many2one('springback.itinerary', 'Itinerary', required=True)
     security = fields.Selection([
                         ('std', 'Standard'),
@@ -94,7 +85,7 @@ class springback_order(models.Model):
                         ],
                 'Security Level')
     total_qty_plan = fields.Integer('Planned Volume')
-    total_qty = fields.Integer('Volume', track_visibility='always')
+    total_qty = fields.Integer('Volume', track_visibility='always', default = 10)
     volperplt = fields.Integer("Volume per Pallet", compute='_volperplt_get')
     #qty = fields.Integer('Volume Subtotal', compute='_qty_all', help="The shipped Quantity of this order", multi="sums")    
     total_plt = fields.Integer('Pallet', compute='_calc_plt')
@@ -124,13 +115,8 @@ class springback_order(models.Model):
                                    \n* The \'Done\' status is set automatically when purchase order is set as done. \
                                    \n* The \'Cancelled\' status is set automatically when user cancel purchase order.',
                                   select=True, copy=False)
-    
-    
-    
-    _defaults = {
-        'customer': _get_default_customer,
-    }
-    
+       
+        
     def create(self, cr, uid, vals, context=None):        
         if vals.get('name','/')=='/':                  
             #vals.get('type','O').upper()[:1]
@@ -141,11 +127,12 @@ class springback_order(models.Model):
         self.message_post(cr, uid, [order], body="Springback order created", context=context)
         
         return order
-        
+    
+ 
     
     @api.one
     def action_draft(self):
-        self.state = 'draft'
+        self.state = 'draft'  
         
     @api.one
     def action_shipping(self):
