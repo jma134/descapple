@@ -1,15 +1,15 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
         <!-- EDI related Email Templates menu -->
-        <record model="ir.actions.act_window" id="action_email_templates">
-            <field name="name">Email Templates</field>
+        <record model="ir.actions.act_window" id="action_transport_email_templates">
+            <field name="name">Transport Email Templates</field>
             <field name="res_model">email.template</field>
             <field name="view_type">form</field>
             <field name="view_mode">form,tree</field>
             <field name="view_id" ref="email_template.email_template_tree" />
             <field name="search_view_id" ref="email_template.view_email_template_search"/>
-            <field name="context" eval="{'search_default_model_id': ref('springback.model_springback_order')}"/>
+            <field name="context" eval="{'search_default_model_id': ref('transport.model_transport_order')}"/>
         </record>
     </data>
 
@@ -17,12 +17,12 @@
          so users can freely customize/delete them -->
     <data noupdate="1">
         <!--Email template -->
-        <record id="email_template_edi_springback" model="email.template">
-            <field name="name">Springback - Send by Email</field>
-            <field name="email_from">mlc1711@163.com</field>
-            <field name="subject">${object.cnee_id.name|safe} Order (Ref ${object.name or 'n/a' })</field>
+        <record id="email_template_edi_transport" model="email.template">
+            <field name="name">Transport - Send by Email</field>
+            <field name="email_from">sam.ma@dhl.com</field>
+            <field name="subject">${object.cnee_id.name|safe} Order (Ref ${object.dn or 'n/a' })</field>
             <field name="partner_to">${object.cnee_id.id}</field>
-            <field name="model_id" ref="springback.model_springback_order"/>
+            <field name="model_id" ref="transport.model_transport_order"/>
             <field name="auto_delete" eval="True"/>
 <!--             <field name="report_template" ref="report_springback_order"/>
             <field name="report_name">Springback_${(object.name or '').replace('/','_')}</field> -->
@@ -35,7 +35,7 @@
    
 </div>
             ]]></field>
-        </record>
+        </record>     
 
     </data>
 </openerp>

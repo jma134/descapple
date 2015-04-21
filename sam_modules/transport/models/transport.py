@@ -86,8 +86,8 @@ class transport_session(osv.osv):
                                    ]),
     }
     
-    org = fields.Char(string="Origin", required=True, size=4)
-    dst = fields.Char(string="Destination", required=True, size=4)
+    org = fields.Char(string="Origin", size=4)
+    dst = fields.Char(string="Destination", size=4)
     itinerary = fields.Char(string="Itinerary", compute='_itinerary')
     
 
@@ -130,7 +130,7 @@ class transport_session(osv.osv):
 
         # Add duration to start_date, but: Monday + 5 days = Saturday, so
         # subtract one second to get on Friday instead
-        start = FD.Datetime.from_string(self.start_date)
+        start = fields.Datetime.from_string(self.start_date)
         duration = timedelta(days=self.duration, seconds=-1)
         self.end_date = start + duration
         
@@ -141,8 +141,8 @@ class transport_session(osv.osv):
 
         # Compute the difference between dates, but: Friday - Monday = 4 days,
         # so add one day to get 5 days instead
-        start_date = FD.Datetime.from_string(self.start_date)
-        end_date = FD.Datetime.from_string(self.end_date)
+        start_date = fields.Datetime.from_string(self.start_date)
+        end_date = fields.Datetime.from_string(self.end_date)
         self.duration = (end_date - start_date).days + 1
         
     @api.one
@@ -189,6 +189,46 @@ class transport_session(osv.osv):
     def _check_instructor_not_in_attendees(self):
         if self.instructor_id and self.instructor_id in self.attendee_ids:
             raise exceptions.ValidationError("A session's instructor can't be an attendee")   
+
+    def send_email_session(self, cr, uid, ids, context=None):
+        '''
+        This function opens a window to compose an email, with the edi purchase template message loaded by default
+        '''
+        if not context:
+            context= {}
+
+        ir_model_data = self.pool.get('ir.model.data')
+        try:
+            #         if context.get('send_param', False):
+            template_id = ir_model_data.get_object_reference(cr, uid, 'transport', 'email_template_transport_session')[1]
+        except ValueError:
+            template_id = False
+
+        try:
+            compose_form_id = ir_model_data.get_object_reference(cr, uid, 'mail', 'email_compose_message_wizard_form')[1]
+        except ValueError:
+            compose_form_id = False
+             
+        ctx = dict(context)
+        ctx.update({
+            'default_model': 'transport.session',
+            'default_res_id': ids[0],
+            'default_use_template': bool(template_id),
+            'default_template_id': template_id,
+            'default_composition_mode': 'comment',
+        })
+        return {
+            'name': _('Compose Email'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        }
+
             
 #----------------------------------------------------------
 # Transport EDI 
