@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+    
+<!-- wizard -->                  
+<!--         <record model="ir.ui.view" id="transport_mywizard_form_view">
+            <field name="name">mywizard.form</field>
+            <field name="model">transport.mywizard</field>
+            <field name="arch" type="xml">
+                <form string="Add Attendees">
+                    <group>
+                        <field name="name1"/>
+                        <field name="name2"/>
+                        <field name="name3"/>
+                    </group>
+                    <footer>
+                        <button name="action_next" type="object"
+                                string="Subscribe" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="launch_transport_mywizard"
+                    name="My Wizard"
+                    res_model="transport.mywizard"      
+                    res_model="transport.mywizard"
+                    view_mode="form"
+                    target="new"
+                    key2="client_action_multi"/> -->
+
+
+
+
+		<record id="view_test_but_open" model="ir.ui.view">
+            <field name="name">test.partners.wizard.form</field>
+            <field name="model">test.partners.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Partners Game" version="7.0">
+                    <separator colspan="4" string="Do you really want to start new game?"/>
+                    <footer>
+                        <button string="New Game" name="test_partners_open_window" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_test_but_open" model="ir.actions.act_window">
+            <field name="name">Partners Game</field>
+            <field name="res_model">test.partners.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_test_but_open"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- <menuitem id="test_but_open_main"
+            name="DEVELOPMENT"
+            /> -->
+        <menuitem id="test_but_open_main" name="DEVELOPMENT" parent="menu_transport_root" sequence="20"/>
+        <menuitem id="test_but_open_sub_section"
+            name="Games"
+            parent="test_but_open_main"
+            />
+        <menuitem id="test_but_open_sub"
+            parent="test_but_open_sub_section"
+            name="Partners Game"
+            action="action_test_but_open"
+            />
+
+        <record id="action_partners_game_tree_1" model="ir.actions.act_window">
+            <field name="name">Partners Game</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">tree</field>
+            <field name="view_id" ref="base.view_partner_tree"/>
+        </record>
+
+        <record id="view_test_next_level" model="ir.ui.view">
+            <field name="name">view.test.next.level.form</field>
+            <field name="model">test.partners.level.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Partners Game - Next Level" version="7.0">
+                    <separator colspan="4" string="Do you really want to go to next level of game?"/>
+                    <footer>
+                        <button string="Next Level" name="next_level" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_next_level" model="ir.actions.act_window">
+            <field name="name">Next Level</field>
+            <field name="res_model">test.partners.level.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_test_next_level"/>
+            <field name="target">new</field>
+        </record>
+
+        <record model="ir.values" id="ir_open_next_level">
+            <field name="key">action</field>
+            <field name="key2">tree_but_open</field>
+            <field name="model">res.partner</field>
+            <field name="name">Next Level</field>
+            <field name="value" eval="'ir.actions.act_window,%d'%action_next_level"/>
+            <field name="object" eval="True"/>
+        </record>
+
+                    
+    </data>
+</openerp>                    

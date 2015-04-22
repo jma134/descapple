@@ -17,3 +17,4 @@ class Wizard(models.TransientModel):
         for session in self.session_ids:
             session.attendee_ids |= self.attendee_ids
         return {}
+    

@@ -37,3 +37,4 @@
 
 import wizard
 import prealert
+import mywizard

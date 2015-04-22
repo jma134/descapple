@@ -41,6 +41,7 @@
         'views/session_workflow.xml',                
         'views/transport_eml_data.xml',
         'views/prealert_view.xml',
+        'views/mywizard.xml',
         'wizard/wizard_view.xml',
         'report/reports.xml',
     ],
