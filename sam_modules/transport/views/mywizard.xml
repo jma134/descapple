@@ -58,19 +58,6 @@
             <field name="target">new</field>
         </record>
 
-        <!-- <menuitem id="test_but_open_main"
-            name="DEVELOPMENT"
-            /> -->
-        <menuitem id="test_but_open_main" name="DEVELOPMENT" parent="menu_transport_root" sequence="20"/>
-        <menuitem id="test_but_open_sub_section"
-            name="Games"
-            parent="test_but_open_main"
-            />
-        <menuitem id="test_but_open_sub"
-            parent="test_but_open_sub_section"
-            name="Partners Game"
-            action="action_test_but_open"
-            />
 
         <record id="action_partners_game_tree_1" model="ir.actions.act_window">
             <field name="name">Partners Game</field>
@@ -112,6 +99,22 @@
             <field name="object" eval="True"/>
         </record>
 
+
+
+        <!-- <menuitem id="test_but_open_main"
+            name="DEVELOPMENT"
+            /> -->
+        <menuitem id="test_but_open_main" name="DEVELOPMENT" parent="menu_transport_root" sequence="20"/>
+        <menuitem id="test_but_open_sub_section"
+            name="Games"
+            parent="test_but_open_main"
+            />
+        <menuitem id="test_but_open_sub"
+            parent="test_but_open_sub_section"
+            name="Partners Game"
+            action="action_test_but_open"
+            />
+            
                     
     </data>
 </openerp>                    

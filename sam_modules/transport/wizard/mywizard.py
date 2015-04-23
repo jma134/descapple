@@ -67,10 +67,12 @@ class test_partners_wizard(osv.osv_memory):
         result = mod_obj.get_object_reference(cr, uid, 'transport', 'action_partners_game_tree_1')
         id = result and result[1] or False
         result = act_obj.read(cr, uid, [id], context=context)[0]
+        print result
         important_value = random.randint(1,100)
         print '[step1] IMPORTANT_VALUE: %s' %important_value # print the important_vaule...        xtx = 
 
         result['context'] = str({'important_value': important_value, 'persist_values': [ 'important_value' ] })
+        print result
         return result
 
 test_partners_wizard()
