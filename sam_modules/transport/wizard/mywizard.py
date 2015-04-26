@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from openerp import models, api
 from openerp.osv import osv
 from openerp.osv import fields
 from openerp.tools.translate import _
@@ -51,7 +52,7 @@ class mywizard(osv.osv_memory):
 
 
 
-class test_partners_wizard(osv.osv_memory):
+class test_partners_wizard(models.TransientModel):
     _name = "test.partners.wizard"
     _description = "Testing tree_but_open for context durability"
     _columns = {
@@ -60,12 +61,15 @@ class test_partners_wizard(osv.osv_memory):
     }
     def test_partners_open_window(self, cr, uid, ids, context=None):
         mod_obj = self.pool.get('ir.model.data')
-        act_obj = self.pool.get('ir.actions.act_window')
+        
         if context is None:
             context = {}
 #         result = mod_obj.get_object_reference(cr, uid, 'test_but_open', 'action_partners_game_tree_1')
         result = mod_obj.get_object_reference(cr, uid, 'transport', 'action_partners_game_tree_1')
         id = result and result[1] or False
+        print id
+        
+        act_obj = self.pool.get('ir.actions.act_window')
         result = act_obj.read(cr, uid, [id], context=context)[0]
         print result
         important_value = random.randint(1,100)
@@ -74,6 +78,36 @@ class test_partners_wizard(osv.osv_memory):
         result['context'] = str({'important_value': important_value, 'persist_values': [ 'important_value' ] })
         print result
         return result
+    
+    @api.multi
+    def test_partners_open_next_wizard(self, context=None):
+        if not context:
+            context= {}
+        print 'mmm', context
+        
+        result = self.env['ir.model.data'].get_object_reference('transport', 'view_test_next_level')
+        print result
+        id = result and result[1] or False
+        
+        ctx = dict(context)
+        ctx.update({
+            'myname': 'Sam',
+        })
+        print ctx
+        
+        return {
+            'name': 'Next Level',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+#             'res_model': 'test.partners.wizard',
+            'res_model': 'test.partners.level.wizard',            
+            'views': [(id, 'form')],
+            'view_id': id,
+            'target': 'new',
+#             'context': context.update({'author': 'samma'})
+            'context': ctx,
+        }
 
 test_partners_wizard()
 
@@ -84,9 +118,11 @@ class test_partners_level_wizard(osv.osv_memory):
         }
         _defaults = {
         }
-        def next_level(self, cr, uid, ids, context=None):
+        def next_level_mmm(self, cr, uid, ids, context=None):
             if context == None:
                 context = {} 
+            print context
+            
             print '[step2] IMPORTANT_VALUE: %s' %context.get('important_value',False) # Now it prints: "[step2] IMPORTANT_VALUE: <same number as in the previous print (step1)>", i.e. the important_value is preserved, because it was listed in 'persist_values' list. of course it's possible to put more then one key to persist in the list and all these keys will be persisted through multiple tree_but_open actions.
             # ....
 

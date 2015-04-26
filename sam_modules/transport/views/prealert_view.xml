@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
-    	<record id="view_transport_prealert_form" model="ir.ui.view">
-            <field name="name">transport.prealert.form</field>
-            <field name="model">transport.prealert</field>
+    	<record id="view_transport_wizardtest_form" model="ir.ui.view">
+            <field name="name">transport.wizardtest.form</field>
+            <field name="model">transport.wizardtest</field>
             <field name="arch" type="xml">
                 <form string="Pre-Alert charts">
                     <group>
@@ -16,7 +16,7 @@
                         </div>
                     </group>
                     <footer>
-                        <button string="Open Alerts" name="transport_prealert_open_window" type="object" class="oe_highlight"/>
+                        <button string="Open Alerts" name="transport_wizardtest_open_window" type="object" class="oe_highlight"/>
                         or
                         <button string="Cancel" class="oe_link" special="cancel"/>
                     </footer>
@@ -24,17 +24,17 @@
             </field>
         </record>
 
-        <record id="action_transport_prealert_wizard" model="ir.actions.act_window">
-            <field name="name">Chart of Accounts</field>
-            <field name="res_model">transport.prealert</field>
+        <record id="action_transport_wizardtest_wizard" model="ir.actions.act_window">
+            <field name="name">WizardTest</field>
+            <field name="res_model">transport.wizardtest</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_transport_prealert_form"/>
+            <field name="view_id" ref="view_transport_wizardtest_form"/>
             <field name="target">new</field>
         </record>
 
-        <menuitem icon="STOCK_INDENT" action="action_transport_prealert_wizard"
-            id="menu_action_transport_prealert_tree2"
+        <menuitem icon="STOCK_INDENT" action="action_transport_wizardtest_wizard"
+            id="menu_action_transport_wizardtest_tree2"
             parent="menu_transport_wizard" />
 		
                                        

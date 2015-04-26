@@ -33,7 +33,7 @@
 
 
 
-
+<!-- #open wizard -->
 		<record id="view_test_but_open" model="ir.ui.view">
             <field name="name">test.partners.wizard.form</field>
             <field name="model">test.partners.wizard</field>
@@ -41,7 +41,8 @@
                 <form string="Partners Game" version="7.0">
                     <separator colspan="4" string="Do you really want to start new game?"/>
                     <footer>
-                        <button string="New Game" name="test_partners_open_window" type="object" class="oe_highlight"/>
+                        <!-- <button string="New Game" name="test_partners_open_window" type="object" class="oe_highlight"/> -->
+                        <button string="New Game" name="test_partners_open_next_wizard" type="object" class="oe_highlight"/>                        
                         or
                         <button string="Cancel" class="oe_link" special="cancel"/>
                     </footer>
@@ -58,7 +59,7 @@
             <field name="target">new</field>
         </record>
 
-
+<!-- click wizard button -->
         <record id="action_partners_game_tree_1" model="ir.actions.act_window">
             <field name="name">Partners Game</field>
             <field name="res_model">res.partner</field>
@@ -66,6 +67,7 @@
             <field name="view_id" ref="base.view_partner_tree"/>
         </record>
 
+<!-- click partner tree view, open new wizard -->
         <record id="view_test_next_level" model="ir.ui.view">
             <field name="name">view.test.next.level.form</field>
             <field name="model">test.partners.level.wizard</field>
@@ -73,7 +75,7 @@
                 <form string="Partners Game - Next Level" version="7.0">
                     <separator colspan="4" string="Do you really want to go to next level of game?"/>
                     <footer>
-                        <button string="Next Level" name="next_level" type="object" class="oe_highlight"/>
+                        <button string="Next Level" name="next_level_mmm" type="object" class="oe_highlight"/>
                         or
                         <button string="Cancel" class="oe_link" special="cancel"/>
                     </footer>
@@ -90,6 +92,18 @@
             <field name="target">new</field>
         </record>
 
+
+        <!-- return {
+            'name': _('Compose Email'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        } -->
         <record model="ir.values" id="ir_open_next_level">
             <field name="key">action</field>
             <field name="key2">tree_but_open</field>
