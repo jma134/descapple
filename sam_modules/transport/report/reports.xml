@@ -27,5 +27,34 @@
             </t>
         </t>
     </template>
+    
+    <report
+        id="report_transport_order1"
+        model="transport.order"
+        string="Order Report1"
+        name="transport.report_transport_order1_view"
+        file="transport.report_order1"
+        report_type="qweb-pdf" />
+
+    <template id="report_transport_order1_view">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="report.external_layout">
+                    <div class="page">
+                        <h2 t-field="doc.dn"/>
+                        <p>From <span t-field="doc.pickupdate"/> to <span t-field="doc.cnee_id"/></p>
+                        <h3>Attendees:</h3>
+                        <ul>
+                            <t t-foreach="doc.order_line" t-as="line">
+                                <li><span t-field="line.name"/></li>
+                                <!-- <li><span t-field="line.product_id"/></li> -->
+                                <li><span t-field="line.product_qty"/></li>                                
+                            </t>
+                        </ul>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>    
 </data>
 </openerp>
