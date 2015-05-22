@@ -17,6 +17,8 @@
                         <h2 t-field="doc.name"/>
                         <p>From <span t-field="doc.start_date"/> to <span t-field="doc.end_date"/></p>
                         <h3>Attendees:</h3>
+						<img t-att-src="'/report/barcode/QR/%s' % 'My text in qr code'"/>
+						<!-- http://127.0.0.1:8069/report/barcode?width=200&type=QR&value=samma_dhl&height=200 -->
                         <ul>
                             <t t-foreach="doc.attendee_ids" t-as="attendee">
                                 <li><span t-field="attendee.name"/></li>

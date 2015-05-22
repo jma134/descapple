@@ -16,6 +16,7 @@
 	                <field name="filesize"/>
 	                <field name="category"/>
 	                <field name="direction"/>
+	                <field name="fullcp"/>
 	                <field name="gentime"/>
 	            </tree>
             </field>
@@ -36,6 +37,7 @@
 			                <field name="direction"/>
                         </group>          
                         <group name="origin_grp" string="EDI Details">
+                        	<field name="fullcp"/>
 			                <field name="modifytime"/>
 			                <field name="createtime"/>
 			                <field name="gentime"/>                                                                            
@@ -175,6 +177,7 @@
 	                <field name="htcpartno"/>
 	                <field name="partdescription"/>
 	                <field name="modelname"/>
+	                <field name="oldmodelname"/>
 	                <field name="color"/>
 	                <field name="packdefinition"/>
 	                <field name="palletdefinition"/>                            
@@ -196,6 +199,7 @@
 							<field name="htcpartno"/>
 							<field name="partdescription"/>
 							<field name="modelname"/>
+							<field name="oldmodelname"/>
 							<field name="color"/>
 							<field name="packdefinition"/>
 							<field name="palletdefinition"/>  

@@ -199,6 +199,7 @@
                                 string="Mark as done" states="confirmed"
                                 class="oe_highlight"/>
                         <button name="send_email_session" string="Send Email" type="object" context="{'send_param':True}" class="oe_highlight"/>
+                        <button name="send_attachment" string="Attachment" type="object" context="{'send_param':True}" class="oe_highlight"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     

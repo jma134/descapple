@@ -189,7 +189,49 @@ class transport_session(osv.osv):
     def _check_instructor_not_in_attendees(self):
         if self.instructor_id and self.instructor_id in self.attendee_ids:
             raise exceptions.ValidationError("A session's instructor can't be an attendee")   
-
+    
+    
+    def send_attachment(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        data = self.read(cr, uid, ids)[0]
+        print self._context.get('active_ids',[])
+        datas = {
+             'ids': [1,7],
+             'model': 'transport.session',
+             'form': data
+                 }
+        return {
+            'type': 'ir.actions.report.xml',
+            'report_name': 'transport.report_session_view',
+            'datas': datas,
+            }
+#         attachment_obj = self.pool.get('ir.attachment')
+#         for record in self.browse(cr, uid, ids, context=context):
+#             ir_actions_report = self.pool.get('ir.actions.report.xml')
+#             matching_reports = ir_actions_report.search(cr, uid, [('name','=','report_service_name_given_in_xml')])
+#             if matching_reports:
+#                 report = ir_actions_report.browse(cr, uid, matching_reports[0])
+#                 report_service = 'report.' + report.report_name
+#                 service = netsvc.LocalService(report_service)
+#                 (result, format) = service.create(cr, uid, [record.id], {'model': self._name}, context=context)
+#                 eval_context = {'time': time, 'object': record}
+#                 if not report.attachment or not eval(report.attachment, eval_context):
+#                     # no auto-saving of report as attachment, need to do it manually
+#                     result = base64.b64encode(result)
+#                     file_name = re.sub(r'[^a-zA-Z0-9_-]', '_', 'Your Report Name')
+#                     file_name += ".pdf"
+#                     attachment_id = attachment_obj.create(cr, uid,
+#                         {
+#                             'name': file_name,
+#                             'datas': result,
+#                             'datas_fname': file_name,
+#                             'res_model': self._name,
+#                             'res_id': record.id,
+#                             'type': 'binary'
+#                         }, context=context)
+#         return True
+        
     def send_email_session(self, cr, uid, ids, context=None):
         '''
         This function opens a window to compose an email, with the edi purchase template message loaded by default

@@ -22,6 +22,7 @@ class htc_master(osv.osv):
         'filesize': fields.integer('Filesize', readonly=True),        
         'category': fields.char('Category', size=1, select=True, readonly=True),        
         'direction': fields.char('Direction', size=3, select=True, readonly=True),
+        'fullcp': fields.boolean('Full Copy', readonly=True),
         
         'modifytime': fields.datetime('File Modified', help="EDI Modified timestamp", readonly=True),
         'createtime': fields.datetime('File Created', help="EDI Received time", readonly=True),       
@@ -91,7 +92,8 @@ class htc_item(osv.osv):
     _columns = {
         'htcpartno': fields.char('PartNo', size=12, select=True, readonly=True),
         'partdescription': fields.char('Description', size=100, readonly=True),
-        'modelname': fields.char('Model Name', size=50, readonly=True),        
+        'modelname': fields.char('Model Name', size=50, readonly=True),
+        'oldmodelname': fields.char('Old Model Name', size=50, readonly=True),         
         'color': fields.char('Color', size=20, readonly=True),        
         'packdefinition': fields.integer('Pack Definition',  readonly=True),
         'palletdefinition': fields.integer('Pallet Definition', readonly=True),
@@ -114,7 +116,8 @@ class htc_item_comp(osv.osv):
     _columns = {
         'htcpartno': fields.char('PartNo', size=12, select=True, readonly=True),
         'partdescription': fields.char('Description', size=100, readonly=True),
-        'modelname': fields.char('Model Name', size=50, readonly=True),        
+        'modelname': fields.char('Model Name', size=50, readonly=True),
+        'oldmodelname': fields.char('Old Model Name', size=50, readonly=True),         
         'color': fields.char('Color', size=20, readonly=True),        
         'packdefinition': fields.integer('Pack Definition',  readonly=True),
         'palletdefinition': fields.integer('Pallet Definition', readonly=True),
