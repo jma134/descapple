@@ -349,10 +349,11 @@
             <field name="arch" type="xml">
                 <tree string="SLD Tree" colors="#0000ff:tt&lt;2;red:tt&gt;3">
                     <field name="org"/>
-                    <field name="dst"/>                    
+                    <field name="orgprovince"/>
+                    <field name="dst"/>
+                    <field name="dstprovince"/>            
                     <field name="itinerary"/>
                     <field name="tt"/>
-                    <field name="dstprovince"/>
                 </tree>
             </field>
         </record>
@@ -397,7 +398,7 @@
         </record>
         
 		<record model="ir.actions.act_window" id="action_transport_sld_tree">
-            <field name="name">SLD</field>
+            <field name="name">SLA</field>
             <field name="res_model">transport.sld</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>

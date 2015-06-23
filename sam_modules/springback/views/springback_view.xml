@@ -76,7 +76,7 @@
         </record>            
             
                 
-		<record id="view_springback_order_form" model="ir.ui.view">
+		<record id="view_springback_order_form" model="ir.ui.view">s
             <field name="name">springback.order.form</field>
             <field name="model">springback.order</field>	
             <field name="arch" type="xml">
@@ -86,7 +86,7 @@
                         <button name="shipping" type="workflow" string="Shipping" states="draft" class="oe_highlight"/>
                         <button name="done" type="workflow" string="Mark as done" states="shipping" class="oe_highlight"/>
                         <button name="archive" type="workflow" string="Archive" states="done"/>
-                        <button name="send_email_spb" string="Send Email" type="object" context="{'send_param':True}" class="oe_highlight"/>
+                        <button name="send_email_auto" string="Send Email" type="object" context="{'send_param':True}" class="oe_highlight"/>
                         <field name="state" widget="statusbar"/>
                     </header>                        
                     <sheet>

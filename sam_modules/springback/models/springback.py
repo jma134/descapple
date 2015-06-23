@@ -198,11 +198,23 @@ class springback_order(models.Model):
 #                 template_id = ir_model_data.get_object_reference(cr, uid, 'purchase', 'email_template_edi_purchase_done')[1]
 #         except ValueError:
 #             template_id = False
-        template_id = 12
+        try:
+            #         if context.get('send_param', False):
+            template_id = ir_model_data.get_object_reference(cr, uid, 'springback', 'email_template_edi_springback')[1]
+        except ValueError:        
+            template_id = False
+            
+        template = self.pool.get('ir.model.data').get_object(cr, uid, 'springback', 'email_template_edi_springback')
+        assert template._name == 'email.template'
+        
+        print template_id, template
+            
+        template_id = 15
         try:
             compose_form_id = ir_model_data.get_object_reference(cr, uid, 'mail', 'email_compose_message_wizard_form')[1]
         except ValueError:
-            compose_form_id = False 
+            compose_form_id = False
+             
         ctx = dict(context)
         ctx.update({
             'default_model': 'springback.order',

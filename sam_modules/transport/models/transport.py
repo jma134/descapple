@@ -316,7 +316,7 @@ class transport_edi(osv.osv):
     
 
 #----------------------------------------------------------
-# Transport SLD 
+# Transport SLA 
 #----------------------------------------------------------
 class transport_sld(models.Model):
     _name = 'transport.sld'
@@ -326,21 +326,22 @@ class transport_sld(models.Model):
 #         return self.env['transport.session'].browse(self._context.get('active_ids'))
 #     
     partner_id = fields.Many2one('res.partner', 'Partner', ondelete='set null', track_visibility='onchange',
-            select=True, help="Linked partner (optional). Usually created when converting the lead.")
+            select=True, help="Linked partner (optional). Usually created when having multi subcontractors.")
     contact_name = fields.Char('Contact Name', size=64)
     partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
     
     org = fields.Char(string="Origin", required=True, size=4)
     dst = fields.Char(string="Destination", required=True, size=4)
     itinerary = fields.Char(string="Itinerary", compute='_itinerary')
-    dstprovince = fields.Char(string="Province", size=30)
+    orgprovince = fields.Char(string="Org Province", size=30)
+    dstprovince = fields.Char(string="Dst Province", size=30)
     tt = fields.Float(string="Transit Time", digits=(5, 1), help="Transit Time in days")
     is_test = fields.Boolean('Is a Test', help="Check if the contact is a company, otherwise it is a person")
 
     
-    _defaults = {
-        'itinerary': "SHA",
-    }
+#     _defaults = {
+#         'itinerary': "SHA",
+#     }
 #     attendee_ids = fields.Many2many('res.partner', string="Attendees")
 
     @api.multi
@@ -354,7 +355,7 @@ class transport_sld(models.Model):
     
     def on_change_partner_id(self, cr, uid, ids, partner_id, context=None):
         values = {}
-        print partner_id
+        #print partner_id
         
         if partner_id:
             partner = self.pool.get('res.partner').browse(cr, uid, partner_id, context=context)
@@ -367,13 +368,15 @@ class transport_sld(models.Model):
     @api.one
     @api.depends('org', 'dst')
     def _itinerary(self):
-        s1 = self.org and self.org or ''
-        if self.dst:
-            s2 = self.dst
-        else:
-            s2 = ''
-         
-        self.itinerary = s1 + s2
+#         s1 = self.org and self.org or ''
+#         if self.dst:
+#             s2 = self.dst
+#         else:
+#             s2 = ''
+        
+        if self.org and self.dst:
+            self.itinerary = str(self.org).upper() + str(self.dst).upper() 
+             
         #self.itinerary = self.org and self.org or '' + self.dst and self.dst or ''
 
 
