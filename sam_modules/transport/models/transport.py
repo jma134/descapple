@@ -320,11 +320,8 @@ class transport_edi(osv.osv):
 #----------------------------------------------------------
 class transport_sld(models.Model):
     _name = 'transport.sld'
-    _inherit = ['mail.thread']
-
-#     def _default_sessions(self):
-#         return self.env['transport.session'].browse(self._context.get('active_ids'))
-#     
+#     _inherit = ['mail.thread']
+     
     partner_id = fields.Many2one('res.partner', 'Partner', ondelete='set null', track_visibility='onchange',
             select=True, help="Linked partner (optional). Usually created when having multi subcontractors.")
     contact_name = fields.Char('Contact Name', size=64)
@@ -335,15 +332,23 @@ class transport_sld(models.Model):
     itinerary = fields.Char(string="Itinerary", compute='_itinerary')
     orgprovince = fields.Char(string="Org Province", size=30)
     dstprovince = fields.Char(string="Dst Province", size=30)
-    tt = fields.Float(string="Transit Time", digits=(5, 1), help="Transit Time in days")
-    is_test = fields.Boolean('Is a Test', help="Check if the contact is a company, otherwise it is a person")
+    tt = fields.Float(string="Transit Time", digits=(5, 1), help="Transit Time in days", required=True)
+    itinerary = fields.Char(string="Itinerary", compute='_itinerary')
+    remark = fields.Text('Remark')
+#     is_test = fields.Boolean('Is a Test', help="Check if the contact is a company, otherwise it is a person")
 
-    
-#     _defaults = {
-#         'itinerary': "SHA",
-#     }
-#     attendee_ids = fields.Many2many('res.partner', string="Attendees")
 
+    _sql_constraints = [
+#         ('name_description_check',
+#          'CHECK(name != description)',
+#          "The title of the course should not be the description"),
+
+        ('itinerary_unique',
+         'UNIQUE(org, dst)',
+         "The Itinerary must be unique"),
+    ]
+
+        
     @api.multi
     def onchange_type(self, is_company):        
         if self.is_test:
@@ -367,17 +372,11 @@ class transport_sld(models.Model):
         
     @api.one
     @api.depends('org', 'dst')
-    def _itinerary(self):
-#         s1 = self.org and self.org or ''
-#         if self.dst:
-#             s2 = self.dst
-#         else:
-#             s2 = ''
-        
+    def _itinerary(self):        
         if self.org and self.dst:
             self.itinerary = str(self.org).upper() + str(self.dst).upper() 
              
-        #self.itinerary = self.org and self.org or '' + self.dst and self.dst or ''
+
 
 
 #----------------------------------------------------------

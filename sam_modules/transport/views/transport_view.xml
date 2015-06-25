@@ -379,13 +379,14 @@
                             </group>
                             <group string="Schedule">
 	                            <field name="org"/>
+	                            <field name="orgprovince"/>
 	                            <field name="dst"/>
-	                            <field name="itinerary"/>
-	                            <field name="is_test"/>
-	                            <field name="dstprovince"
+	                            <field name="dstprovince"/>
+	                            <field name="itinerary"/>	                            
+<!-- 	                            <field name="dstprovince"
 		                            placeholder="Company"
 		                            domain="[('is_test', '=', True)]" attrs="{'invisible': [('is_test','=', True)]}"
-		                            on_change="onchange_type(org)"/>
+		                            on_change="onchange_type(org)"/> -->
 
 	                            <field name="tt"/>
                             </group>

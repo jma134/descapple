@@ -76,7 +76,7 @@
         </record>            
             
                 
-		<record id="view_springback_order_form" model="ir.ui.view">s
+		<record id="view_springback_order_form" model="ir.ui.view">
             <field name="name">springback.order.form</field>
             <field name="model">springback.order</field>	
             <field name="arch" type="xml">
