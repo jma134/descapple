@@ -411,9 +411,9 @@ class transport_order(models.Model):
         
     dn = fields.Char('Delivery No.', size=10, select=True, required=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
     #product_id = fields.Many2one('product.product', 'Material', required=True, select=True, domain=[('type', '<>', 'service')], states={'done': [('readonly', True)]})
-    cnee_name = fields.Char('Name1', size=128)
+    cnee_name = fields.Char('Name', size=128)
     sales_doc = fields.Char('Sales Doc', size=10)
-    pono = fields.Char('Purchase Order#', size=32)       
+    pono = fields.Char('Purchase Order', size=32)       
     cnee_id = fields.Many2one('res.partner', 'Consignee', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
                                  domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "Teacher")])    
     shpr_pt = fields.Char('ShPt', size=4)

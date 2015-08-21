@@ -461,7 +461,7 @@
 								<field name="pickupdate"/>
                             </group>
                             <group string="Schedule">                                
-                                <field name="qty"/>
+                                <!-- <field name="qty"/> -->
                                 <field name="shpr_id"/>
                                 <field name="shpr_pt"/>                                                                                          
                                 <field name="plt_qty"/>
