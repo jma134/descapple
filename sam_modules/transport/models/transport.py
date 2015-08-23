@@ -420,9 +420,12 @@ class transport_order(models.Model):
     shpr_id = fields.Many2one('res.partner', 'Shipper', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
                                  domain=['|', ('instructor', '=', True),('category_id.name', 'ilike', "OEM")])
     partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
-    org = fields.Char("Orig", compute='_org_get')
-    dst = fields.Char("Dest", compute='_dst_get')
-    tt = fields.Float("Transit Time", compute='_tt_get', help="Transit Time in days")
+#     org = fields.Char("Orig", compute='_org_get')
+#     dst = fields.Char("Dest", compute='_dst_get')
+    org = fields.Many2one('transport.city', 'Org', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
+    dst = fields.Many2one('transport.city', 'Dest', states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
+    poe = fields.Char("POE", size=4)
+#     tt = fields.Float("Transit Time", compute='_tt_get', help="Transit Time in days")
     qty = fields.Integer('Dlvy Qty', compute='_qty_all', help="The Total Quantity of this DN", multi="sums")    
     plt_qty = fields.Integer('Plt Qty', default=1)
     order_line = fields.One2many('transport.order.line', 'order_id', 'Order Lines',
@@ -452,39 +455,39 @@ class transport_order(models.Model):
     def confirm_order(self):
         self.state = 'confirmed'
         
-    @api.one
-    @api.depends('shpr_id')
-    def _org_get(self):
-        if not (self.shpr_id):            
-            return
-        
-        self.org = self.shpr_id.city
-    
-    @api.one
-    @api.depends('cnee_id')
-    def _dst_get(self):
-        if not (self.cnee_id):            
-            return
-        
-        self.dst = self.cnee_id.city
+#     @api.one
+#     @api.depends('shpr_id')
+#     def _org_get(self):
+#         if not (self.shpr_id):            
+#             return
+#         
+#         self.org = self.shpr_id.city
+#     
+#     @api.one
+#     @api.depends('cnee_id')
+#     def _dst_get(self):
+#         if not (self.cnee_id):            
+#             return
+#         
+#         self.dst = self.cnee_id.city
         
 
-    @api.one
-    @api.depends('org', 'dst')
-    def _tt_get(self):
-        if self.org and self.dst:
-            sld_obj=self.pool.get('transport.sld')     
-            sld_ids = sld_obj.search(self._cr, self._uid, [('org', '=', self.org), ('dst', '=', self.dst)])
-            #print types
-            if sld_ids:
-                sld = sld_obj.browse(self._cr, self._uid, sld_ids, context=self._context)
-#                 self.tt = random.randint(1, 10)
-                self.tt = sld[0].tt
-                #print sld[0].tt                
-            else:
-                self.tt = 0
-        else:
-            self.tt = 0
+#     @api.one
+#     @api.depends('org', 'dst')
+#     def _tt_get(self):
+#         if self.org and self.dst:
+#             sld_obj=self.pool.get('transport.sld')     
+#             sld_ids = sld_obj.search(self._cr, self._uid, [('org', '=', self.org), ('dst', '=', self.dst)])
+#             #print types
+#             if sld_ids:
+#                 sld = sld_obj.browse(self._cr, self._uid, sld_ids, context=self._context)
+# #                 self.tt = random.randint(1, 10)
+#                 self.tt = sld[0].tt
+#                 #print sld[0].tt                
+#             else:
+#                 self.tt = 0
+#         else:
+#             self.tt = 0
             
     
     def button_dummy(self, cr, uid, ids, context=None):
@@ -627,6 +630,23 @@ class transport_order_line(models.Model):
 
         return res                
     
+#----------------------------------------------------------
+# Transport City 
+#----------------------------------------------------------
+class transport_city(models.Model):
+    _name = 'transport.city'
+     
+    name = fields.Char('City Code', required=True, size=4) 
+    cityname = fields.Char('City Name', size=32)
+    province = fields.Char('Province', size=32)
+    province_cn = fields.Char('Proince CN', size=16)
+    province_sn = fields.Char('Proince ShortName', size=1)
+    
+    _sql_constraints = [
+        ('cityname_unique',
+         'UNIQUE(name)',
+         "The City Code must be unique"),
+    ]    
     
     
 #     http://odoo-new-api-guide-line.readthedocs.org/en/latest/fields.html

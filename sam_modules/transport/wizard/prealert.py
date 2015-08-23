@@ -24,9 +24,12 @@ class transport_prealert(models.TransientModel):
         except ValueError:
             template_ids = False
         
-        #email = self.env['email.template'].browse(template_ids[0])
-        email = self.env['email.template']
-        email.write(template_ids[0], {'subject': 'subject123'})
+        email = self.env['email.template'].browse(template_ids[0])
+        email[0].subject = 'asdf'
+            
+        
+        #email.write(template_ids[0], {'subject': 'subject123'})
+        #self.pool.get('email.template').write(template_ids[0], {'subject': 'subject123'})
         #self.env['email.template'].write(template_ids[0], {'subject': 'subject~~'})
 #         email.write({ 'subject': 'spam & eggs'})
         

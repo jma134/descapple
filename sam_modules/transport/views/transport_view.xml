@@ -449,9 +449,10 @@
 	                        </h1>
 	                    </div>
                         <group>
-                            <group string="General">
-                                <field name="cnee_id" string="Customer"
-                                	options='{"create_name_field": "name"}'/>
+                            <group>
+                                <!-- <field name="cnee_id" string="Customer"
+                                	options='{"create_name_field": "name"}'/> -->
+                                <field name="shpr_id"/>
                                 <field name="cnee_name"/>                                
 								<field name="sales_doc"/>
 								<field name="pono"/>								
@@ -460,12 +461,12 @@
 								<field name="trackno"/>
 								<field name="pickupdate"/>
                             </group>
-                            <group string="Schedule">                                
+                            <group>                                
                                 <!-- <field name="qty"/> -->
-                                <field name="shpr_id"/>
-                                <field name="shpr_pt"/>                                                                                          
+                                <field name="cnee_id"/>
+                                <field name="poe"/>                                                                                          
                                 <field name="plt_qty"/>
-                                <field name="tt"/>                           
+                                <!-- <field name="tt"/>   -->                         
                                 <label for="street" string="ETA"/>
                                 <div>                                	
 	                                <field name="eta"/>                               
@@ -483,17 +484,17 @@
 	                                    <field name="product_id" 
 	                                    	on_change="onchange_product_id(product_id,0,False,parent.cnee_id,name,parent.state,context)"/>
 	                                    <field name="name"/>                                   		                                    
-	                                    
-	                                    <field name="product_qty"/>
+	                                    	                                    
 	                                    <field name="product_uom"/>
 	                                    <field name="price_unit"/>
+	                                    <field name="product_qty"/>
 	                                    <!-- <field name="taxes_id" widget="many2many_tags" domain="[('parent_id','=',False),('type_tax_use','!=','sale')]"/> -->
 	                                    <!-- <field name="price_subtotal"/> -->
 	                                    <field name="state" invisible="1"/>
 	                                </tree>
 	                            </field>
 	                            <group class="oe_subtotal_footer oe_right">
-	                                <field name="qty" widget="monetary"/>	                                
+	                                <!-- <field name="qty" widget="monetary"/>  -->                             
 	                                <div class="oe_subtotal_footer_separator oe_inline">
 	                                    <label for="qty"/>
 	                                    <button name="button_dummy"
@@ -536,7 +537,55 @@
 
 		<menuitem action="action_transport_order_tree" id="menu_action_transport_order_tree" parent="menu_transport_edi" sequence="1"/>
 		
-		
+
+<!--
+    Transport City
+-->	
+		<record  model="ir.ui.view" id="view_transport_city_tree">
+            <field name="name">transport.city.tree</field>
+            <field name="model">transport.city</field>
+            <field name="arch" type="xml">
+                <tree string="City Tree">                    
+                    <field name="name"/>
+                    <field name="cityname"/>
+                    <field name="province"/>
+                    <field name="province_cn"/>            
+                    <field name="province_sn"/>                    
+                </tree>
+            </field>
+        </record>
+        
+		<record model="ir.ui.view" id="view_transport_sld_form">
+            <field name="name">transport.city.form</field>
+            <field name="model">transport.city</field>
+            <field name="arch" type="xml">
+                <form string="Course Form">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+		                    <field name="cityname"/>
+		                    <field name="province"/>
+		                    <field name="province_cn"/>            
+		                    <field name="province_sn"/>  
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+		<record model="ir.actions.act_window" id="action_transport_city_tree">
+            <field name="name">City</field>
+            <field name="res_model">transport.city</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first City
+                </p>
+            </field>
+        </record>
+
+		<menuitem action="action_transport_city_tree" id="menu_action_transport_city_tree" parent="menu_transport_configuration" sequence="1"/>
+                    		
 		
                                        
     </data>
