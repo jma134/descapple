@@ -435,7 +435,8 @@ class transport_order(models.Model):
     hawb = fields.Char('HAWB', size=23, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
     trackno = fields.Char('Tracking No.', size=23, select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
     pickupdate = fields.Datetime('Pickup Date', help="Pickup Date, usually the time DESC pickup @ SLC", select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
-    eta = fields.Date('ETA', compute='_eta')
+#     eta = fields.Date('ETA', compute='_eta')
+    eta = fields.Datetime('ETA', help="Estimated Time of Arrival.", select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
     remark = fields.Char('Remark', size=64)  
     description = fields.Text('Notes')
     

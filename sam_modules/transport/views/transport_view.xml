@@ -452,8 +452,7 @@
                             <group>
                                 <!-- <field name="cnee_id" string="Customer"
                                 	options='{"create_name_field": "name"}'/> -->
-                                <field name="shpr_id"/>
-                                <field name="cnee_name"/>                                
+                                <field name="shpr_id"/>                                                                
 								<field name="sales_doc"/>
 								<field name="pono"/>								
 								<!-- <field name="product_id"/> -->
@@ -464,17 +463,18 @@
                             <group>                                
                                 <!-- <field name="qty"/> -->
                                 <field name="cnee_id"/>
-                                <field name="poe"/>                                                                                          
-                                <field name="plt_qty"/>
+                                <field name="cnee_name"/>
+                                <!-- <field name="poe"/> -->                                                                                         
                                 <!-- <field name="tt"/>   -->                         
-                                <label for="street" string="ETA"/>
-                                <div>                                	
-	                                <field name="eta"/>                               
+                                <label for="street" string="Org > Dst"/>
+                                <div>                               	
 	                                <div>                                    
-	                                    <field name="org" placeholder="City" style="width: 50%%"/>                                    
-	                                    <field name="dst" style="width: 50%%"/>
+	                                    <field name="org" placeholder="SLC City" style="width: 50%%"/>                                    
+	                                    <field name="dst" placeholder="Cnee City" style="width: 50%%"/>
 	                                </div>									
-								</div>								
+								</div>
+								<field name="plt_qty"/>
+								<field name="eta"/>
                             </group>
 						</group>                            
                            <notebook>
