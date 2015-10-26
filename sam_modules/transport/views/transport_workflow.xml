@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+<!-- transport -->    
+        <record model="workflow" id="wkf_transport_order">
+            <field name="name">Transport Workflow</field>
+            <field name="osv">transport.order</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <record model="workflow.activity" id="transport_draft">
+            <field name="name">Draft</field>
+            <field name="wkf_id" ref="wkf_transport_order"/>
+            <field name="flow_start" eval="True"/>
+            <field name="kind">function</field>
+            <field name="action">action_draft()</field>
+        </record>
+        <record model="workflow.activity" id="transport_shipping">
+            <field name="name">Shipping</field>
+            <field name="wkf_id" ref="wkf_transport_order"/>
+            <field name="kind">function</field>
+            <field name="action">action_shipping()</field>
+        </record>
+        <record model="workflow.activity" id="transport_pod">
+            <field name="name">POD</field>
+            <field name="wkf_id" ref="wkf_transport_order"/>
+            <field name="kind">function</field>
+            <field name="action">action_pod()</field>
+        </record>        
+        <record model="workflow.activity" id="transport_done">
+            <field name="name">Done</field>
+            <field name="wkf_id" ref="wkf_transport_order"/>
+            <field name="kind">function</field>
+            <field name="action">action_done()</field>
+        </record>
+
+
+		<record model="workflow.transition" id="transport_draft_to_picking">
+            <field name="act_from" ref="transport_draft"/>
+            <field name="act_to" ref="transport_shipping"/>
+            <field name="signal">confirm1</field>
+        </record>
+        <record model="workflow.transition" id="transport_picking_to_draft">
+            <field name="act_from" ref="transport_shipping"/>
+            <field name="act_to" ref="transport_draft"/>
+            <field name="signal">draft1</field>
+        </record>
+        <record model="workflow.transition" id="transport_done_to_draft">
+            <field name="act_from" ref="transport_done"/>
+            <field name="act_to" ref="transport_draft"/>
+            <field name="signal">draft1</field>
+        </record>
+        <record model="workflow.transition" id="transport_shipping_to_done">
+            <field name="act_from" ref="transport_shipping"/>
+            <field name="act_to" ref="transport_done"/>
+            <field name="signal">done1</field>
+        </record>
+        
+<!--          <record model="workflow.transition" id="transport_shipping_to_pod">
+            <field name="act_from" ref="transport_shipping"/>
+            <field name="act_to" ref="transport_pod"/>
+            <field name="signal">pod</field>
+        </record>
+        <record model="workflow.transition" id="transport_pod_to_done">
+            <field name="act_from" ref="transport_pod"/>
+            <field name="act_to" ref="transport_done"/>
+            <field name="signal">done</field> 
+        </record> -->
+        
+        
+<!--         <record model="workflow.transition" id="transport_done_to_archive">
+            <field name="act_from" ref="done"/>
+            <field name="act_to" ref="archive"/>
+            <field name="signal">archive</field>
+        </record> -->
+        
+<!--         <record model="workflow.transition" id="transport_auto_shipping">
+            <field name="act_from" ref="transport_draft"/>
+            <field name="act_to" ref="transport_shipping"/>
+            <field name="condition">plt_qty &gt; 1</field>
+        </record> -->
+
+        
+    </data>
+</openerp>

@@ -20,31 +20,28 @@
 ##############################################################################
 
 {
-    'name': 'Transport Platform',
+    'name': 'Pioneer SDD Platform',
     'version': '1.0',
     'author': 'Sam Ma',
-    'summary': 'Transport & Distribute, Logistic',
+    'summary': 'Inner City Distribute',
     'description' : """
         designed for DSC Apple T&D Team
     """,
     'website': 'http://www.dhl.com',
-    'images': ['images/vmi.jpg'],
+    'images': ['images/pioneer.jpg'],
     'depends': ['product', 'account'],
     'category': 'Transport Platform',
     'sequence': 1,
     'data': [
-        'security/security.xml',
-        'security/ir.model.access.csv',
+#         'security/security.xml',
+#         'security/ir.model.access.csv',
         #'wizard/vmi_location_product_view.xml',
-        'views/transport_view.xml',
-        'views/transport_workflow.xml',
-        'views/partner.xml',
-        'views/session_workflow.xml',                
-        'views/transport_eml_data.xml',
-        'views/prealert_view.xml',
-        'views/mywizard.xml',
-        'wizard/wizard_view.xml',
-        'report/reports.xml',         
+        'views/pioneer_view.xml',
+        'views/pioneer_order_maps.xml',
+#         'views/pioneer_workflow.xml',
+#         'views/partner.xml',             
+#         'views/pioneer_eml_data.xml',
+
     ],
     'installable': True,
 #    'application': True,

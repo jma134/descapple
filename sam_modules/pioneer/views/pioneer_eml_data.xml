@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- EDI related Email Templates menu -->
+        <record model="ir.actions.act_window" id="action_email_templates">
+            <field name="name">Email Templates</field>
+            <field name="res_model">email.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="email_template.email_template_tree" />
+            <field name="search_view_id" ref="email_template.view_email_template_search"/>
+            <field name="context" eval="{'search_default_model_id': ref('transport.model_transport_order')}"/>
+        </record>
+    </data>
+
+    <!-- Mail template are declared in a NOUPDATE block
+         so users can freely customize/delete them -->
+    <data noupdate="1">
+        <!--Email template -->
+        <record id="email_template_edi_transport" model="email.template">
+            <field name="name">transport - Send by Email</field>
+            <field name="email_from">sam.ma@dhl.com</field>
+            <field name="subject">${object.cnee_id.name|safe} Order (Ref ${object.dn or 'n/a' })</field>
+            <field name="partner_to">${object.cnee_id.id}</field>
+            <field name="model_id" ref="transport.model_transport_order"/>
+            <field name="auto_delete" eval="True"/>
+<!--             <field name="report_template" ref="report_transport_order"/>
+            <field name="report_name">transport_${(object.name or '').replace('/','_')}</field> -->
+            <field name="lang">${object.cnee_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+    <p>Hello ${object.cnee_id.name},</p>
+    
+   
+</div>
+            ]]></field>
+        </record>
+    </data>
+    
+    
+    <!-- Mail template are declared in a NOUPDATE block
+         so users can freely customize/delete them -->
+    <data noupdate="1">
+        <!--Email template -->
+        <record id="email_template_transport_session" model="email.template">
+            <field name="name">Sessions - Send by Email</field>
+            <field name="email_from">sam.ma@dhl.com</field>
+            <field name="subject">${object.course_id.name|safe} Order (Ref ${object.name or 'n/a' })</field>
+            <field name="partner_to">${object.instructor_id.id}</field>
+            <field name="model_id" ref="transport.model_transport_session"/>
+            <field name="auto_delete" eval="True"/>
+<!--             <field name="report_template" ref="report_springback_order"/>
+            <field name="report_name">Springback_${(object.name or '').replace('/','_')}</field> -->
+            <field name="lang">${object.instructor_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+    <p>Hello ${object.instructor_id.name},</p>
+    
+   
+</div>
+            ]]></field>
+        </record>
+  	</data>      
+
+    <!-- Mail template are declared in a NOUPDATE block
+         so users can freely customize/delete them -->
+    <data noupdate="1">
+        <!--Email template -->
+        <record id="email_template_transport_prealert" model="email.template">
+            <field name="name">Pre-Alert - Send by Email</field>
+            <field name="email_from">sam.ma@dhl.com</field>
+            <field name="subject">${object.session_ids.dn|safe} Order (Ref ${object.session_ids.hawb or 'n/a' })</field>
+            <field name="partner_to">${object.session_ids.cnee_id}</field>
+            <field name="model_id" ref="transport.model_transport_prealert"/>
+            <field name="auto_delete" eval="True"/>
+<!--             <field name="report_template" ref="report_springback_order"/>
+            <field name="report_name">Springback_${(object.name or '').replace('/','_')}</field> -->
+            <field name="lang">${object.session_ids.cnee_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+    <p>Hello ${object.session_ids.dn},</p>
+    
+   
+</div>
+            ]]></field>
+        </record>                
+    </data>
+    
+    
+    
+</openerp>

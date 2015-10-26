@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2015 Akretion France (www.akretion.com)
+    @author: Alexis de Lattre <alexis.delattre@akretion.com>
+    The licence is in the file __openerp__.py
+-->
+
+<openerp>
+	<data>
+	
+		<!--  Inherit partner view to add 'Map' button -->
+		<record id="view_pioneer_order_map_form" model="ir.ui.view">
+		    <field name="name">map.button.pioneer.order.form</field>
+		    <field name="model">pioneer.order</field>
+		    <field name="inherit_id" ref="pioneer.view_pioneer_order_form"/>
+		    <field name="arch" type="xml">
+		        <xpath expr="//div[@name='buttons']" position="inside">
+		            <button class="oe_inline oe_stat_button"
+		                name="open_map" type="object" string="Map"		                
+		                icon="fa-map-marker"/>
+		            <button class="oe_inline oe_stat_button"
+		                name="open_route_map" type="object" string="Route Map"		             
+		                icon="fa-car"/>
+		            <button class="oe_inline oe_stat_button"
+		                name="open_route_map" type="object" string="Route Map"
+		                attrs="{'invisible': [('city', '=', False)]}"
+		                icon="fa-twitter"/>
+		            <button class="oe_inline oe_stat_button"
+		                name="open_route_map" type="object" string="Route Map"
+		                attrs="{'invisible': [('city', '=', False)]}"
+		                icon="fa-square"/>		                		                
+		        </xpath>
+		        
+	<!-- 			<page string="Map">
+                      <group>
+                          <field name="geo_point" widget="geo_edit_map"/>
+                      </group>
+                 </page> -->
+		    </field>
+		</record>
+	
+	</data>
+</openerp>

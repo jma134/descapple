@@ -189,7 +189,7 @@
             <field name="arch" type="xml">
                 <form string="Session Form">
                 	<header>
-                        <button name="draft" type="workflow"
+                        <button name="draft1" type="workflow"
                                 string="Reset to draft"
                                 states="confirmed,done"/>
                         <button name="confirm" type="workflow"
@@ -210,15 +210,17 @@
                                 <field name="name"/>
                                 <field name="instructor_id"/>
                                 <field name="active"/>
+                                <field name="org"/>
+	                            <field name="dst"/>
+	                            <field name="itinerary"/>
                             </group>
                             <group string="Schedule">
                                 <field name="start_date"/>
                                 <field name="duration"/>
+                                <field name="end_date"/>
                                 <field name="seats"/>
                                 <field name="taken_seats" widget="progressbar"/>
-                                <field name="org"/>
-	                            <field name="dst"/>
-	                            <field name="itinerary"/>
+                                
                             </group>                                                       
                         </group>
                         <label for="attendee_ids"/>
@@ -422,15 +424,61 @@
             <field name="arch" type="xml">
             <tree string="transport order list">
                 <field name="dn"/>
+                <field name="hawb"/>
                 <field name="cnee_id"/>
+                <field name="qty"/>                
                 <field name="pickupdate"/>
-                <field name="qty"/>
                 <field name="eta"/>
                 <!-- <field name="product_id"/> -->                               
                 <field name="state"/>
             </tree>
             </field>
-        </record>    
+        </record>   
+        
+        <!-- calendar view -->
+        <record id="view_transport_order_calendar" model="ir.ui.view">
+            <field name="name">transport.order.calendar</field>
+            <field name="model">transport.order</field>
+            <field name="arch" type="xml">
+                <calendar string="Transport Calendar" date_start="pickupdate" date_stop="eta"
+                          color="dn">
+                    <field name="dn"/>
+                    <field name="qty"/>
+                </calendar>
+            </field>
+        </record>
+        
+        <!-- graph view -->
+         <record id="view_transport_graph" model="ir.ui.view">
+            <field name="name">transport.order.graph</field>
+            <field name="model">transport.order</field>
+            <field name="arch" type="xml">
+                <graph string="Qty by DN#">
+                    <field name="dn"/>
+                    <field name="qty" type="measure"/>
+                </graph>
+            </field>
+        </record>
+        
+        <record id="view_transport_order_search" model="ir.ui.view">
+            <field name="name">transport.order.search</field>
+            <field name="model">transport.order</field>
+            <field name="arch" type="xml">
+                <search string="Transport Search">
+                	<!-- <field name="name" string="Product Lots" filter_domain="['|',('name','ilike',self),('ref','ilike',self)]"/> -->
+                    <field name="dn" string="DN#"/>
+                    <field name="hawb" string="HAWB"/>                    
+                    <group expand="0" string="Group By...">
+                    	<filter string="Shpr" icon="terp-go-month" domain="[]" context="{'group_by':'shpr_id'}" help="Order by Shpr"/>
+                    	<filter string="Cnee" icon="terp-go-month" domain="[]" context="{'group_by':'cnee_id'}" help="Order by Cnee"/>
+                    	<filter string="Pickup" icon="terp-go-month" domain="[]" context="{'group_by':'pickupdate'}" help="Order by Pickup"/>
+                    	<filter string="ETA" icon="terp-go-month" domain="[]" context="{'group_by':'eta'}" help="Order by ETA"/>                        
+                        <filter string="Status" icon="terp-go-month" domain="[]" context="{'group_by':'state'}" help="Order by Status"/>
+                    </group>d
+                </search>                
+            </field>
+        </record>         
+                 
                 
 		<record id="view_transport_order_form" model="ir.ui.view">
             <field name="name">transport.order.form</field>
@@ -438,7 +486,20 @@
             <field name="arch" type="xml">
                 <form string="Transport Order Form">
                 	<header>
-                		<button name="confirm_order" states="draft" string="Confirm" type="object" class="oe_highlight"/>
+                		<!-- <button name="action_shipping" states="draft" string="Confirm" type="object" class="oe_highlight"/> -->
+                        <button name="draft1" type="workflow"
+                                string="Reset to draft"
+                                states="shipping"/>
+                        <button name="confirm1" type="workflow"
+                                string="Confirm" states="draft"
+                                class="oe_highlight"/>
+                        <button name="done1" type="workflow"
+                                string="Mark as done" states="shipping"
+                                class="oe_highlight"/>
+                        <button name="draft1" type="workflow"
+                                string="Reset "
+                                states="done"/>
+
                         <field name="state" widget="statusbar"/>
                     </header>                    
                     <sheet>
@@ -459,6 +520,7 @@
 								<field name="hawb"/>
 								<field name="trackno"/>
 								<field name="pickupdate"/>
+								<field name="taken_event"/>								
                             </group>
                             <group>                                
                                 <!-- <field name="qty"/> -->
@@ -509,6 +571,17 @@
 
 		                    
 		                    <page string="EDI Info">
+		                    	<field name="edi_detail">
+	                                <tree string="Transport EDI Details">	                                    
+	                                    <field name="name"/> 		                                    
+	                                    <field name="category"/>
+	                                    <field name="eventcd"/>	                                    
+	                                    <field name="eventtime"/>
+	                                    <field name="triggertime"/>
+	                                    <field name="gentime"/>
+	                                    <field name="state" invisible="1"/>
+	                                </tree>
+	                            </field>
 		                        <group>
 		                            
 		                        </group>
@@ -528,7 +601,9 @@
             <field name="name">Order</field>
             <field name="res_model">transport.order</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,calendar,graph</field>
+			<!-- <field name="domain">[('state','in',('draft','picking','pod'))]</field> -->
+            <field name="search_view_id" ref="view_transport_order_search"/>            
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">Create the first Transport Order
                 </p>
@@ -555,7 +630,7 @@
             </field>
         </record>
         
-		<record model="ir.ui.view" id="view_transport_sld_form">
+		<record model="ir.ui.view" id="view_transport_city_form">
             <field name="name">transport.city.form</field>
             <field name="model">transport.city</field>
             <field name="arch" type="xml">

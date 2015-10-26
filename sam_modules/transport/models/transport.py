@@ -135,6 +135,7 @@ class transport_session(osv.osv):
         self.end_date = start + duration
         
     @api.one
+    @api.depends('start_date', 'end_date')
     def _set_end_date(self):
         if not (self.start_date and self.end_date):
             return
@@ -278,15 +279,18 @@ class transport_session(osv.osv):
 class transport_edi(osv.osv):
     _name = "transport.edi"
     _description = "Transport EDI"
-    _order = "id desc"
+    _order = "eventtime"
      
-
+    
     _columns = {
         'name': FD.char('BizNo', size=16, select=True, readonly=True),
         'category': FD.char('EDI', size=6, select=True, readonly=True),
         'msgid': FD.char('MsgID', size=50, readonly=True),
         'fname': FD.char('FileName', size=100, readonly=True),
+        'order_id': FD.many2one('transport.order', 'Order Reference', select=True, required=True, ondelete='cascade'),
         'isa': FD.char('ISA#', size=9, select=True, readonly=True),
+        'eventtime': FD.datetime('Event Happned Time', help="DHL Link EDI Receive Time", readonly=True),
+        'triggertime': FD.datetime('TMS Triggered Time', help="DHL Link EDI Send Time", readonly=True),
         'recvtime': FD.datetime('ReceiveTime', help="DHL Link EDI Receive Time", readonly=True),
         'sendtime': FD.datetime('SendTime', help="DHL Link EDI Send Time", readonly=True),
         'exception': FD.char('ExceptionID', size=10, readonly=True),        
@@ -327,11 +331,11 @@ class transport_sld(models.Model):
     contact_name = fields.Char('Contact Name', size=64)
     partner_name = fields.Char("Customer Name", size=64,help='The name of the future partner company that will be created while converting the lead into opportunity', select=1)
     
-    org = fields.Char(string="Origin", required=True, size=4)
-    dst = fields.Char(string="Destination", required=True, size=4)
-    itinerary = fields.Char(string="Itinerary", compute='_itinerary')
-    orgprovince = fields.Char(string="Org Province", size=30)
-    dstprovince = fields.Char(string="Dst Province", size=30)
+    org = fields.Many2one('transport.city', 'Origin', required=True)
+    dst = fields.Many2one('transport.city', 'Destination', required=True)
+    orgprovince = fields.Char(string="Org Province", compute='_itinerary')
+    dstprovince = fields.Char(string="Dst Province", compute='_itinerary')
+    itinerary = fields.Char(string="Itinerary", compute='_itinerary')    
     tt = fields.Float(string="Transit Time", digits=(5, 1), help="Transit Time in days", required=True)
     itinerary = fields.Char(string="Itinerary", compute='_itinerary')
     remark = fields.Text('Remark')
@@ -369,12 +373,18 @@ class transport_sld(models.Model):
                 'contact_name': partner.name if partner.parent_id else False,
             }
         return {'value': values}
-        
+    
+      
     @api.one
     @api.depends('org', 'dst')
-    def _itinerary(self):        
+    def _itinerary(self): 
+        if self.org:
+            self.orgprovince = self.org.province
+        if self.dst:
+            self.dstprovince = self.dst.province
+                       
         if self.org and self.dst:
-            self.itinerary = str(self.org).upper() + str(self.dst).upper() 
+            self.itinerary = str(self.org.name).upper() + str(self.dst.name).upper() 
              
 
 
@@ -386,18 +396,20 @@ class transport_order(models.Model):
     _name = "transport.order"
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     _description = "Transport Order"
+    _rec_name = 'dn'
     _order = 'id desc'
+    
     
     STATE_SELECTION = [
         ('draft', 'Draft'),
-        ('sent', 'PreAlert'),
+#         ('sent', 'PreAlert'),
 #         ('confirmed', 'Confirmed'),
 #         ('approved', 'Purchase Confirmed'),
-        ('picking', 'Shipping'),
+        ('shipping', 'Shipping'),
         ('pod', 'POD'),
-        ('invoiced', 'Invoiced'),
+#         ('invoiced', 'Invoiced'),
         ('done', 'Done'),
-        ('cancel', 'Cancelled'),
+#         ('cancel', 'Cancelled'),
     ]
     
     @api.one
@@ -432,6 +444,7 @@ class transport_order(models.Model):
                                       states={'picking':[('readonly',True)],
                                               'done':[('readonly',True)]},
                                       copy=True)
+    edi_detail = fields.One2many('transport.edi', 'order_id', 'EDI Detail', readonly=True, copy=False)
     hawb = fields.Char('HAWB', size=23, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
     trackno = fields.Char('Tracking No.', size=23, select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, copy=False)
     pickupdate = fields.Datetime('Pickup Date', help="Pickup Date, usually the time DESC pickup @ SLC", select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
@@ -439,7 +452,7 @@ class transport_order(models.Model):
     eta = fields.Datetime('ETA', help="Estimated Time of Arrival.", select=True, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
     remark = fields.Char('Remark', size=64)  
     description = fields.Text('Notes')
-    
+    taken_event = fields.Integer('Taken Events', compute='_taken_event')
     state = fields.Selection(STATE_SELECTION, 'Status', readonly=True,
                                   help=' * The \'Draft\' status is set automatically when purchase order in draft status. \
                                    \n* The \'Confirmed\' status is set automatically as confirm when purchase order in confirm status. \
@@ -447,14 +460,66 @@ class transport_order(models.Model):
                                    \n* The \'Cancelled\' status is set automatically when user cancel purchase order.',
                                   select=True, copy=False)
      
-     
+    _defaults = {
+        'state': 'draft',
+    }
+        
+    _sql_constraints = [
+        ('order_dn_unique',
+         'UNIQUE(dn)',
+         "The DN# must be unique"),
+    ]
+    
+    @api.one
+    def action_draft(self):
+        print '2222223  33333333333333333333'
+        self.state = 'draft'  
+        
+    @api.one
+    def action_shipping(self):
+        print '444444444444444444444444444444 '
+        self.state = 'shipping'
+
+    @api.one
+    def action_pod(self):
+        self.state = 'pod'
+                
+    @api.one
+    def action_done(self):
+        self.state = 'done'
+
+
+    
+    @api.one
+    @api.depends('edi_detail')
+    def _taken_event(self):
+        print 11111111111111111111111111111
+        if self.edi_detail:
+            if self.state == 'draft' and self.taken_event <> 1:
+                print "mmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+                for cd in self.edi_detail:
+                    print cd.eventcd
+                    if cd.eventcd == 'AF':
+                        print self.state
+                        self.state = 'shipping'
+                        self.taken_event = 1                        
+                        break
+                    
+#             elif self.state == 'picking':
+#                 for cd in self.edi_detail:
+#                     print cd
+#                     if cd.eventcd == 'D1':
+#                         self.state = 'pod'
+#                         break
+
+         
     @api.one
     def _eta(self):
         self.eta = fields.datetime.now()
     
-    @api.one
-    def confirm_order(self):
-        self.state = 'confirmed'
+#     @api.one
+#     def confirm_order(self):
+#         self.state = 'picking'
         
 #     @api.one
 #     @api.depends('shpr_id')
@@ -491,8 +556,8 @@ class transport_order(models.Model):
 #             self.tt = 0
             
     
-    def button_dummy(self, cr, uid, ids, context=None):
-        return True    
+#     def button_dummy(self, cr, uid, ids, context=None):
+#         return True    
     
           
 

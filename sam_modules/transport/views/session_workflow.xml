@@ -35,12 +35,12 @@
         <record model="workflow.transition" id="session_confirmed_to_draft">
             <field name="act_from" ref="confirmed"/>
             <field name="act_to" ref="draft"/>
-            <field name="signal">draft</field>
+            <field name="signal">draft1</field>
         </record>
         <record model="workflow.transition" id="session_done_to_draft">
             <field name="act_from" ref="done"/>
             <field name="act_to" ref="draft"/>
-            <field name="signal">draft</field>
+            <field name="signal">draft1</field>
         </record>
         <record model="workflow.transition" id="session_confirmed_to_done">
             <field name="act_from" ref="confirmed"/>
